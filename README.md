@@ -7,6 +7,7 @@ instance, we can think of the data collected by the cameras or GPS sensors in ou
 or the performed ultrasounds and X-ray scans, or the data produced by the Internet of Things
 (IoT). They are all of great value to the world of Big Data and Machine Learning (ML) applications,
 but are also protected by privacy and, therefore, unusable by traditional methods.
+
 Introduced in 2016 by Google, Federated Learning (FL) is a machine learning scenario born with
 the aim of using privacy-protected data without violating the regulations in force. This framework
 deals with learning a central server model in privacy-constrained scenarios, where data are
@@ -14,6 +15,7 @@ stored on multiple devices (i.e. the clients). Unlike the standard machine learn
 model has no direct access to the data, which never leave the clients’ devices: a fundamental
 requirement for any application where users’ privacy must be preserved (e.g. medical records,
 bank transactions).
+
 In this project, you will become familiar with the federated scenario and its standard architecture.
 Once implemented your baseline, you will analyze the variations that occur by modifying the
 value of the parameters specific to this framework, assessing the most effective ones. Finally,
