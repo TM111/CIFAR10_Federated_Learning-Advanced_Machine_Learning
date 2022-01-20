@@ -1,5 +1,7 @@
 # Federated Learning: where machine learning and data privacy can coexist
-##Overview
+
+## Overview
+
 Nowadays, a lot of data is generated but cannot be exploited due to its sensitive nature. For
 instance, we can think of the data collected by the cameras or GPS sensors in our mobile phones,
 or the performed ultrasounds and X-ray scans, or the data produced by the Internet of Things
@@ -17,7 +19,9 @@ Once implemented your baseline, you will analyze the variations that occur by mo
 value of the parameters specific to this framework, assessing the most effective ones. Finally,
 basing on the identified problems of the resulting model, you will propose a possible solution to
 address one of them.
-##Goals
+
+## Goals
+
 1. To get familiar with Federated Learning and its main algorithms and architecture.
 2. To replicate the experiments proposed by [3] on the CIFAR10 dataset.
 3. To understand the contribution made by each parameter of the federated setting by proposing an experimental study.
