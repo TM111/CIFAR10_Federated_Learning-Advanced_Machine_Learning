@@ -16,18 +16,11 @@ model has no direct access to the data, which never leave the clients’ devices
 requirement for any application where users’ privacy must be preserved (e.g. medical records,
 bank transactions).
 
-In this project, you will become familiar with the federated scenario and its standard architecture.
-Once implemented your baseline, you will analyze the variations that occur by modifying the
-value of the parameters specific to this framework, assessing the most effective ones. Finally,
-basing on the identified problems of the resulting model, you will propose a possible solution to
-address one of them.
-
 ## Goals
 
-1. To get familiar with Federated Learning and its main algorithms and architecture.
-2. To replicate the experiments proposed by [3] on the CIFAR10 dataset.
-3. To understand the contribution made by each parameter of the federated setting by proposing an experimental study.
-4. To understand the importance of clients’ local data distribution in the federated scenario.
-5. To understand the contribution of the normalization layers.
-6. To make your contribution for solving existing issues.
+1. Replicate the experiments proposed by [this](https://arxiv.org/abs/2003.08082) on the CIFAR10 dataset.
+2. Understand the contribution made by each parameter of the federated setting by proposing an experimental study.
+3. Understand the importance of clients’ local data distribution in the federated scenario.
+4. Understand the contribution of the normalization layers.
+5. Make a contribution for solving existing issues.
 
