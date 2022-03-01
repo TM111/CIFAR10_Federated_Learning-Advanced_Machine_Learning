@@ -1,13 +1,10 @@
 from torchvision import transforms as transforms
 import torchvision
-import torch.utils.data
-import collections
-import csv
-from os import path
-import os
-import urllib.request 
-import zipfile
+import torch
+import copy
 import random
+import torch.backends.cudnn as cudnn
+from clients import evaluate
 
 def get_dataset():
     train_transform =  transforms.Compose([transforms.ToTensor()])
@@ -16,102 +13,127 @@ def get_dataset():
     train_set = torchvision.datasets.CIFAR10(root='./CIFAR10', train=True, download=True, transform=train_transform)
     test_set = torchvision.datasets.CIFAR10(root='./CIFAR10', train=False, download=True, transform=test_transform)
 
-    #train_loader = torch.utils.data.DataLoader(dataset=train_set, batch_size=BATCH_SIZE, shuffle=False)
-    #test_loader = torch.utils.data.DataLoader(dataset=test_set, batch_size=BATCH_SIZE, shuffle=False)
-
     # Check dataset sizes
     print('Train Dataset: {}'.format(len(train_set)))
     print('Test Dataset: {}'.format(len(test_set)))
     return train_set,test_set
 
 
-def cifar_parser(line, is_train=True):
-  if is_train:
-    user_id, image_id, class_id = line
-    return user_id, image_id, class_id
-  else:
-    image_id, class_id = line
-    return image_id, class_id
+#https://github.com/AshwinRJ/Federated-Learning-PyTorch/blob/master/src/utils.py
+
+#Calculate AVG for each clients layers
+def average_weights(updates,clients):           # AggregateClient()
+    #IMPLEMENTATION OF FEDAVG
+    total_samples=0
+    for c in clients:
+      total_samples=total_samples+len(c.train_loader.dataset)
+
+    updates_avg = copy.deepcopy(updates[0])
+    for key in updates_avg.keys():
+        updates_avg[key] = updates_avg[key]*0
+
+    for key in updates_avg.keys():
+        for i in range(0, len(updates)):
+            updates_avg[key] = updates_avg[key] + updates[i][key]*len(clients[i].train_loader.dataset)
+        updates_avg[key] = torch.div(updates_avg[key], total_samples)
+    return updates_avg
 
 
-def dirichlet_distribution(alpha):    # generate trainset split from csv
-  #download csv files
-  url="http://storage.googleapis.com/gresearch/federated-vision-datasets/cifar10_v1.1.zip"
-  dir="/content/cifar10_csv"
-  try:
-    os.mkdir(dir)
-  except:
-    print("Folder already exist")
+#CLIENTS -> MAIN MODEL & AVERAGE
+def set_averaged_weights_as_main_model_weights_and_update_main_model(main_model,clients,SERVER_LR):
+  local_updates=[]
+  for c in clients:
+    local_updates.append(copy.deepcopy(c.updates))
 
-  urllib.request.urlretrieve(url, "/content/cifar10_csv/cifar.zip")
-  with zipfile.ZipFile("/content/cifar10_csv/cifar.zip","r") as zip_ref:
-      zip_ref.extractall("/content/cifar10_csv")
+  updates = average_weights(local_updates,clients) # AggregateClient()
 
-  train_file="cifar10_csv/federated_train_alpha_"+alpha+".csv"
-  """Inspects the federated train split."""
-  print('Train file: %s' % train_file)
-  if not path.exists(train_file):
-    print('Error: file does not exist.')
-    return
-  user_images={}
-  with open(train_file) as f:
-    reader = csv.reader(f)
-    next(reader)  # skip header.
-    for line in reader:
-      user_id, image_id, class_id = cifar_parser(line, is_train=True)
-      if(user_id not in user_images.keys()):
-        user_images[user_id]=[]
-      user_images[user_id].append(int(image_id))
-  return user_images
+  w=main_model.state_dict()
+  for key in w.keys():
+    updates[key] = w[key]+SERVER_LR*updates[key]    # θt+1 ← θt - γgt
+  main_model.load_state_dict(copy.deepcopy(updates))
+  return main_model
 
-def cifar_iid(train_set,NUM_CLIENTS): # all clients have all classes with the same data distribution
-  user_images={}
-  classes_dict={}
-  for i in range(len(train_set)):
-    label=train_set[i][1]
-    if(label not in classes_dict.keys()):
-      classes_dict[label]=[]
-    classes_dict[label].append(i)
-  classes_index=[]
-  for label in classes_dict.keys():
-    classes_index=classes_index+classes_dict[label]
+#PRINTS FOR DEBUG
+def printWeights(clients,main_model,MODEL):   # test to view if the algotihm is correct
+    w=[]
+    for c in clients:
+      w.append(c.net.state_dict())
+    w_avg=main_model.state_dict()
+    if(MODEL=='LeNet5'):
+      s=''
+      for i in range(len(clients)):
+        s=s+'size '+str(len(clients[i].train_loader.dataset))+' '+str(w[i]["conv1.weight"][0][0][0][0])+'     '
+      print(s)
+      print('avg '+str(w_avg["conv1.weight"][0][0][0][0]))
+    elif(MODEL=='mobilenetV2'):
+      s=''
+      for i in range(len(clients)):
+        s=s+'size '+str(len(clients[i].train_loader.dataset))+' '+str(w[i]["features.2.conv.1.1.weight"][0])+'     '
+      print(s)
+      print('avg '+str(w_avg["features.2.conv.1.1.weight"][0]))
 
-  count=0
-  for i in classes_index:
-    if(str(count) not in user_images.keys()):
-      user_images[str(count)]=[]
-    user_images[str(count)].append(i)
-    count=count+1
-    if(count==NUM_CLIENTS):
-      count=0
-  return user_images
+#MAIN MODEL -> CLIENTS
+def send_main_model_to_nodes_and_update_clients(main_model, clients):
+    with torch.no_grad():
+      w=main_model.state_dict()
+      for i in range(len(clients)):
+        clients[i].net.load_state_dict(copy.deepcopy(w))
+    return clients
 
-def cifar_noniid(train_set,NUM_CLASSES,NUM_CLASS_RANGE): # all clients have a number of class beetwen 1 and 4 with the same data distribution
-  user_images=cifar_iid()
-  for key in user_images.keys():
-    n_classes=random.randint(NUM_CLASS_RANGE[0],NUM_CLASS_RANGE[1])
-    list_of_class=random.sample(range(0, NUM_CLASSES), n_classes)
-    new_index_list=[]
-    for i in user_images[key]:
-      label=int(train_set[i][1])
-      if(label in list_of_class):
-        new_index_list.append(i)
-    user_images[key]=new_index_list
-  return user_images
 
-def generated_test_distribution(classes, test_set, num_samples,BATCH_SIZE):    # generate testset with specific class and size
-  test_user_images=[]
-  count=0
-  for c in classes:
-    count=count+1
-    indexes=list(range(len(test_set)))
-    for i in range(random.randint(2,7)):
-      random.shuffle(indexes)
-    for i in indexes:
-      if(test_set[i][1]==c):
-        test_user_images.append(i)
-      if(len(test_user_images)==int(num_samples/len(classes)+1)*count):
-        break
-  dataset_ = torch.utils.data.Subset(test_set, test_user_images)
-  dataloader = torch.utils.data.DataLoader(dataset=dataset_, batch_size=BATCH_SIZE, shuffle=False)
-  return dataloader
+
+#TRAIN ALL CLIENTS
+def start_train_nodes(clients,DEVICE):
+    for i in range(len(clients)): 
+        clients[i].net = clients[i].net.to(DEVICE) # this will bring the network to GPU if DEVICE is cuda
+        previousW=copy.deepcopy(clients[i].net.state_dict())  #save the weights     θ ← θt
+
+        cudnn.benchmark # Calling this optimizes runtime
+        for epoch in range(clients[i].local_epoch):    
+            for images, labels in clients[i].train_loader:
+              # Bring data over the device of choice
+              images = images.to(DEVICE)
+              labels = labels.to(DEVICE)
+
+              clients[i].net.train() # Sets module in training mode
+
+              clients[i].optimizer.zero_grad() # Zero-ing the gradients
+              # Forward pass to the network
+              outputs = clients[i].net(images)
+              # Compute loss based on output and ground truth
+              loss = clients[i].criterion(outputs, labels)
+
+              # Compute gradients for each layer and update weights
+              loss.backward()  # backward pass: computes gradients
+              clients[i].optimizer.step() # update weights based on accumulated gradients
+
+        #calculate update   Δθ ← θt - θ
+        updates=clients[i].net.state_dict()
+        for key in updates.keys():
+          updates[key] = updates[key]-previousW[key]
+        clients[i].updates=copy.deepcopy(updates)
+    return clients
+
+
+#WEIGHTED ACCURACY
+def weighted_accuracy(clients):
+  sum=0
+  num_samples=0
+  for i in range(len(clients)):
+    test_loss, test_accuracy = evaluate(clients[i].net,clients[i].criterion, clients[i].test_loader)
+    w=len(clients[i].train_loader.dataset)
+    num_samples=num_samples+w
+
+    sum=sum+test_accuracy*w
+  return sum/num_samples
+
+
+#SELECT CLIENTS
+def selectClients(clients):
+  for i in range(random.randint(2,7)):
+    random.shuffle(clients)
+
+  round_clients_list=[]
+  for i in range(NUM_SELECTED_CLIENTS):
+    round_clients_list.append(clients[i])
+  return round_clients_list
