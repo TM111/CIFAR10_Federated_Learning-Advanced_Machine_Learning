@@ -13,3 +13,4 @@ if __name__ == '__main__':
     if args.model == 'cnn':
         a=get_net('LeNet5')
         print(a)
+        print(98798)
