@@ -3,7 +3,7 @@
 # Python version: 3.6
 
 import argparse
-    
+
 def args_parser():
     parser = argparse.ArgumentParser()
 
