@@ -98,3 +98,20 @@ def cifar_noniid(train_set,NUM_CLASSES,NUM_CLASS_RANGE): # all clients have a nu
         new_index_list.append(i)
     user_images[key]=new_index_list
   return user_images
+
+def generated_test_distribution(classes, test_set, num_samples,BATCH_SIZE):    # generate testset with specific class and size
+  test_user_images=[]
+  count=0
+  for c in classes:
+    count=count+1
+    indexes=list(range(len(test_set)))
+    for i in range(random.randint(2,7)):
+      random.shuffle(indexes)
+    for i in indexes:
+      if(test_set[i][1]==c):
+        test_user_images.append(i)
+      if(len(test_user_images)==int(num_samples/len(classes)+1)*count):
+        break
+  dataset_ = torch.utils.data.Subset(test_set, test_user_images)
+  dataloader = torch.utils.data.DataLoader(dataset=dataset_, batch_size=BATCH_SIZE, shuffle=False)
+  return dataloader
