@@ -9,7 +9,8 @@ args = args_parser()
 args.model='cnn'
 
 if __name__ == '__main__':
-    #args = args_parser()
+    if(args.colab==True):
+        args = args_parser()
     if args.model == 'cnn':
         a=get_net('LeNet5')
         print(a)
