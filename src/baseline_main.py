@@ -25,15 +25,15 @@ if __name__ == '__main__':
     
     distribution=args.DISTRIBUTION
     alpha=args.ALPHA
-    
+    print(alpha)
     if(distribution==1):  # https://github.com/google-research/google-research/tree/master/federated_vision_datasets
       train_user_images=dirichlet_distribution(alpha)
     
     elif(distribution==2):
-      train_user_images=cifar_iid(args)
+      train_user_images=cifar_iid(train_set,args)
     
     elif(distribution==3):  # https://towardsdatascience.com/preserving-data-privacy-in-deep-learning-part-2-6c2e9494398b
-      train_user_images=cifar_noniid(args)
+      train_user_images=cifar_noniid(train_set,args)
      
         
     train_loader_list={}   #TRAIN LOADER DICT
