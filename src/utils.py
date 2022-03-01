@@ -4,7 +4,7 @@ import torch
 import copy
 import random
 import torch.backends.cudnn as cudnn
-from clients import evaluate
+from model import evaluate
 
 def get_dataset(args):
     train_transform =  transforms.Compose([transforms.ToTensor()])
