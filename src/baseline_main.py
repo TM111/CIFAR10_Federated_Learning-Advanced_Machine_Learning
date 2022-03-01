@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Python version: 3.6
-
+from utils import dirichlet_distribution, cifar_iid, cifar_noniid
 from options import args_parser
 from models import get_net
 
