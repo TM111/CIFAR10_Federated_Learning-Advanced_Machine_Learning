@@ -1,4 +1,4 @@
-from utils import generated_test_distribution
+from sampling import generated_test_distribution
 from models import get_net
 import torch.optim
 import torch.nn as nn
