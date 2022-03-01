@@ -30,10 +30,10 @@ if __name__ == '__main__':
       train_user_images=dirichlet_distribution(alpha)
     
     elif(distribution==2):
-      train_user_images=cifar_iid()
+      train_user_images=cifar_iid(args)
     
     elif(distribution==3):  # https://towardsdatascience.com/preserving-data-privacy-in-deep-learning-part-2-6c2e9494398b
-      train_user_images=cifar_noniid()
+      train_user_images=cifar_noniid(args)
      
         
     train_loader_list={}   #TRAIN LOADER DICT

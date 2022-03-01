@@ -46,7 +46,7 @@ def dirichlet_distribution(alpha):    # generate trainset split from csv
   return user_images
 
 
-def cifar_iid(train_set,NUM_CLIENTS): # all clients have all classes with the same data distribution
+def cifar_iid(train_set,args): # all clients have all classes with the same data distribution
   user_images={}
   classes_dict={}
   for i in range(len(train_set)):
@@ -64,16 +64,16 @@ def cifar_iid(train_set,NUM_CLIENTS): # all clients have all classes with the sa
       user_images[str(count)]=[]
     user_images[str(count)].append(i)
     count=count+1
-    if(count==NUM_CLIENTS):
+    if(count==args.NUM_CLIENTS):
       count=0
   return user_images
 
 
-def cifar_noniid(train_set,NUM_CLASSES,NUM_CLASS_RANGE): # all clients have a number of class beetwen 1 and 4 with the same data distribution
+def cifar_noniid(train_set,args): # all clients have a number of class beetwen 1 and 4 with the same data distribution
   user_images=cifar_iid()
   for key in user_images.keys():
-    n_classes=random.randint(NUM_CLASS_RANGE[0],NUM_CLASS_RANGE[1])
-    list_of_class=random.sample(range(0, NUM_CLASSES), n_classes)
+    n_classes=random.randint(args.NUM_CLASS_RANGE[0],args.NUM_CLASS_RANGE[1])
+    list_of_class=random.sample(range(0, args.NUM_CLASSES), n_classes)
     new_index_list=[]
     for i in user_images[key]:
       label=int(train_set[i][1])
@@ -83,7 +83,7 @@ def cifar_noniid(train_set,NUM_CLASSES,NUM_CLASS_RANGE): # all clients have a nu
   return user_images
 
 
-def generated_test_distribution(classes, test_set, num_samples,BATCH_SIZE):    # generate testset with specific class and size
+def generated_test_distribution(classes, test_set, num_samples,args):    # generate testset with specific class and size
   test_user_images=[]
   count=0
   for c in classes:
@@ -97,5 +97,5 @@ def generated_test_distribution(classes, test_set, num_samples,BATCH_SIZE):    #
       if(len(test_user_images)==int(num_samples/len(classes)+1)*count):
         break
   dataset_ = torch.utils.data.Subset(test_set, test_user_images)
-  dataloader = torch.utils.data.DataLoader(dataset=dataset_, batch_size=BATCH_SIZE, shuffle=False)
+  dataloader = torch.utils.data.DataLoader(dataset=dataset_, batch_size=args.BATCH_SIZE, shuffle=False)
   return dataloader

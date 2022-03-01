@@ -5,7 +5,7 @@ import torch.nn as nn
 
 #Client datastructure
 class Client():
-    def __init__(self, id,net,train_lr,optimizer,criterion):
+    def __init__(self, id,net,train_lr,optimizer,criterion,args):
         self.id = id
         self.net=net
         self.train_loader=train_lr
@@ -14,7 +14,7 @@ class Client():
         for data in train_lr.dataset:
           if(data[1] not in classes):
             classes.append(data[1])
-        self.test_loader=generated_test_distribution(classes, int(len(train_lr.dataset)*0.15)) #specific testset for each clients
+        self.test_loader=generated_test_distribution(classes, int(len(train_lr.dataset)*0.15),args) #specific testset for each clients
 
         self.optimizer=optimizer
         self.criterion=criterion
@@ -33,5 +33,5 @@ def get_clients_list(train_loader_list,args):
       net=get_net()
       opt = torch.optim.SGD(net.parameters(), lr=args.LR, momentum=args.MOMENTUM)
       crt=nn.CrossEntropyLoss()
-      client=Client(i,net,train_loader_list[str(i)],opt,crt)
+      client=Client(i,net,train_loader_list[str(i)],opt,crt,args)
       clients_list.append(client)
