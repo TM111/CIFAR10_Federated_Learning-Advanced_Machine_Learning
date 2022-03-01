@@ -6,17 +6,20 @@ import random
 import torch.backends.cudnn as cudnn
 from clients import evaluate
 
-def get_dataset():
+def get_dataset(args):
     train_transform =  transforms.Compose([transforms.ToTensor()])
     test_transform = transforms.Compose([transforms.ToTensor()])
 
     train_set = torchvision.datasets.CIFAR10(root='./CIFAR10', train=True, download=True, transform=train_transform)
     test_set = torchvision.datasets.CIFAR10(root='./CIFAR10', train=False, download=True, transform=test_transform)
 
+    train_loader = torch.utils.data.DataLoader(dataset=train_set, batch_size=args.BATCH_SIZE, shuffle=False)
+    test_loader = torch.utils.data.DataLoader(dataset=test_set, batch_size=args.BATCH_SIZE, shuffle=False)
+    
     # Check dataset sizes
     print('Train Dataset: {}'.format(len(train_set)))
     print('Test Dataset: {}'.format(len(test_set)))
-    return train_set,test_set
+    return test_set, train_set, train_loader, test_loader
 
 
 #https://github.com/AshwinRJ/Federated-Learning-PyTorch/blob/master/src/utils.py
@@ -40,7 +43,7 @@ def average_weights(updates,clients):           # AggregateClient()
 
 
 #CLIENTS -> MAIN MODEL & AVERAGE
-def set_averaged_weights_as_main_model_weights_and_update_main_model(main_model,clients,SERVER_LR):
+def send_client_models_to_server_and_aggregate(main_model,clients,args):
   local_updates=[]
   for c in clients:
     local_updates.append(copy.deepcopy(c.updates))
@@ -49,23 +52,23 @@ def set_averaged_weights_as_main_model_weights_and_update_main_model(main_model,
 
   w=main_model.state_dict()
   for key in w.keys():
-    updates[key] = w[key]+SERVER_LR*updates[key]    # θt+1 ← θt - γgt
+    updates[key] = w[key]+args.SERVER_LR*updates[key]    # θt+1 ← θt - γgt
   main_model.load_state_dict(copy.deepcopy(updates))
   return main_model
 
 #PRINTS FOR DEBUG
-def printWeights(clients,main_model,MODEL):   # test to view if the algotihm is correct
+def print_weights(clients,main_model,args):   # test to view if the algotihm is correct
     w=[]
     for c in clients:
       w.append(c.net.state_dict())
     w_avg=main_model.state_dict()
-    if(MODEL=='LeNet5'):
+    if(args.MODEL=='LeNet5'):
       s=''
       for i in range(len(clients)):
         s=s+'size '+str(len(clients[i].train_loader.dataset))+' '+str(w[i]["conv1.weight"][0][0][0][0])+'     '
       print(s)
       print('avg '+str(w_avg["conv1.weight"][0][0][0][0]))
-    elif(MODEL=='mobilenetV2'):
+    elif(args.MODEL=='mobilenetV2'):
       s=''
       for i in range(len(clients)):
         s=s+'size '+str(len(clients[i].train_loader.dataset))+' '+str(w[i]["features.2.conv.1.1.weight"][0])+'     '
@@ -73,7 +76,7 @@ def printWeights(clients,main_model,MODEL):   # test to view if the algotihm is 
       print('avg '+str(w_avg["features.2.conv.1.1.weight"][0]))
 
 #MAIN MODEL -> CLIENTS
-def send_main_model_to_nodes_and_update_clients(main_model, clients):
+def send_server_model_to_clients(main_model, clients):
     with torch.no_grad():
       w=main_model.state_dict()
       for i in range(len(clients)):
@@ -83,17 +86,17 @@ def send_main_model_to_nodes_and_update_clients(main_model, clients):
 
 
 #TRAIN ALL CLIENTS
-def start_train_nodes(clients,DEVICE):
+def train_clients(clients,args):
     for i in range(len(clients)): 
-        clients[i].net = clients[i].net.to(DEVICE) # this will bring the network to GPU if DEVICE is cuda
+        clients[i].net = clients[i].net.to(args.DEVICE) # this will bring the network to GPU if DEVICE is cuda
         previousW=copy.deepcopy(clients[i].net.state_dict())  #save the weights     θ ← θt
 
         cudnn.benchmark # Calling this optimizes runtime
         for epoch in range(clients[i].local_epoch):    
             for images, labels in clients[i].train_loader:
               # Bring data over the device of choice
-              images = images.to(DEVICE)
-              labels = labels.to(DEVICE)
+              images = images.to(args.DEVICE)
+              labels = labels.to(args.DEVICE)
 
               clients[i].net.train() # Sets module in training mode
 
@@ -129,11 +132,11 @@ def weighted_accuracy(clients):
 
 
 #SELECT CLIENTS
-def selectClients(clients):
+def select_clients(clients,args):
   for i in range(random.randint(2,7)):
     random.shuffle(clients)
 
   round_clients_list=[]
-  for i in range(NUM_SELECTED_CLIENTS):
+  for i in range(args.NUM_SELECTED_CLIENTS):
     round_clients_list.append(clients[i])
   return round_clients_list

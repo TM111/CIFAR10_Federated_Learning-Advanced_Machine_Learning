@@ -27,11 +27,11 @@ class Client():
         
 
 #Istance list of clients
-def get_clients_list(NUM_CLIENTS,LR,MOMENTUM,train_loader_list):
+def get_clients_list(train_loader_list,args):
     clients_list=[]
-    for i in range(NUM_CLIENTS):
+    for i in range(args.NUM_CLIENTS):
       net=get_net()
-      opt = torch.optim.SGD(net.parameters(), lr=LR, momentum=MOMENTUM)
+      opt = torch.optim.SGD(net.parameters(), lr=args.LR, momentum=args.MOMENTUM)
       crt=nn.CrossEntropyLoss()
       client=Client(i,net,train_loader_list[str(i)],opt,crt)
       clients_list.append(client)

@@ -36,16 +36,16 @@ def get_net(MODEL):
       return mobilenetV2()
 
 #DEFINE TEST FUNCTION
-def evaluate(net, criterion,dataloader, DEVICE, print_tqdm = True):
+def evaluate(net, criterion,dataloader, args, print_tqdm = True):
   with torch.no_grad():
-    net = net.to(DEVICE) # this will bring the network to GPU if DEVICE is cuda
+    net = net.to(args.DEVICE) # this will bring the network to GPU if DEVICE is cuda
     net.train(False) # Set Network to evaluation mode
     running_corrects = 0
     #iterable = tqdm(dataloader) if print_tqdm else dataloader
     losses = []
     for images, labels in dataloader: 
-      images = images.to(DEVICE)
-      labels = labels.to(DEVICE)
+      images = images.to(args.DEVICE)
+      labels = labels.to(args.DEVICE)
       # Forward Pass
       outputs = net(images)
       loss = criterion(outputs, labels)
