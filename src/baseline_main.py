@@ -37,6 +37,7 @@ if __name__ == '__main__':
      
         
     train_loader_list={}   #TRAIN LOADER DICT
+    print(train_user_images)
     for user_id in train_user_images.keys():
       dataset_ = torch.utils.data.Subset(train_set, train_user_images[user_id])
       dataloader = torch.utils.data.DataLoader(dataset=dataset_, batch_size=args.BATCH_SIZE, shuffle=False)
