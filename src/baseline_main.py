@@ -12,3 +12,4 @@ if __name__ == '__main__':
     #args = args_parser()
     if args.model == 'cnn':
         a=get_net('LeNet5')
+        print(a)
