@@ -28,7 +28,7 @@ def dirichlet_distribution(alpha):    # generate trainset split from csv
   with zipfile.ZipFile("/content/cifar10_csv/cifar.zip","r") as zip_ref:
       zip_ref.extractall("/content/cifar10_csv")
 
-  train_file="cifar10_csv/federated_train_alpha_"+alpha+".csv"
+  train_file="/content/cifar10_csv/federated_train_alpha_"+alpha+".csv"
   """Inspects the federated train split."""
   print('Train file: %s' % train_file)
   if not path.exists(train_file):
