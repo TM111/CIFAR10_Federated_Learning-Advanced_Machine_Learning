@@ -11,11 +11,11 @@ import torch.nn as nn
 import time
 
 args = args_parser()
-if(args.colab==False):
+if(args.COLAB==False):
     args.MODEL='LeNet5'
 
 if __name__ == '__main__':
-    if(args.colab==True):
+    if(args.COLAB==True):
         args = args_parser()
     if args.MODEL == 'LeNet5':
         print("prova args")
