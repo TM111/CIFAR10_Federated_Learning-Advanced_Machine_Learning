@@ -85,7 +85,7 @@ if __name__ == '__main__':
       round_clients_list=train_clients(round_clients_list,args)
     
       #CLIENTS -> MAIN MODEL & AVERAGE
-      main_model= send_client_models_to_server_and_aggregate(server_model,round_clients_list,args)
+      server_model= send_client_models_to_server_and_aggregate(server_model,round_clients_list,args)
     
       #DEBUG
       debug=0
@@ -97,7 +97,7 @@ if __name__ == '__main__':
       clients_list=send_server_model_to_clients(server_model, clients_list)
     
       #TEST
-      test_loss, main_model_accuracy = evaluate(server_model, server_criterion, args, test_loader)
+      test_loss, main_model_accuracy = evaluate(server_model, server_criterion, test_loader,args)
       main_model_accuracy=round(main_model_accuracy,3)
       w_accuracy=round(weighted_accuracy(clients_list),3)
       seconds=str(round(float(time.time() - start_time),2))
