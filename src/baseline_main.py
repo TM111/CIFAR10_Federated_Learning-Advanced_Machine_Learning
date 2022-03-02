@@ -17,9 +17,10 @@ if(args.COLAB==False):
     args.CENTRALIZED_MODE=True
 
 if __name__ == '__main__':
+    print(args.CENTRALIZED_MODE)
     if(args.COLAB==True):
         args = args_parser()
-        
+    print(args.CENTRALIZED_MODE)
     if(args.CENTRALIZED_MODE==True):
         args.DISTRIBUTION=1
         args.NUM_CLIENTS=100
