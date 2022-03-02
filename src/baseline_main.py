@@ -23,7 +23,7 @@ if __name__ == '__main__':
     if(args.CENTRALIZED_MODE):
         args.DISTRIBUTION=1
         args.NUM_CLIENTS=100
-        args.NUM_SELECTED_CLIENTS=1
+        args.NUM_SELECTED_CLIENTS=2
         
     centralized_accuracy=9
 
