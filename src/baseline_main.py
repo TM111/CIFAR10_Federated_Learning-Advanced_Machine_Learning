@@ -21,9 +21,9 @@ if __name__ == '__main__':
         args = args_parser()
         
     if(args.CENTRALIZED_MODE):
-        args.DISTRIBUTION=3
-        args.NUM_CLIENTS=25
-        args.NUM_SELECTED_CLIENTS=3
+        args.DISTRIBUTION=1
+        args.NUM_CLIENTS=100
+        args.NUM_SELECTED_CLIENTS=1
         
     centralized_accuracy=9
     
