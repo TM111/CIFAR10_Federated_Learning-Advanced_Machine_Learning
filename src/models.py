@@ -29,10 +29,10 @@ def mobilenetV2(pretrain=True):
   model = torch.hub.load('pytorch/vision:v0.10.0', 'mobilenet_v2', pretrained=pretrain)
   return model
 
-def get_net(MODEL):
-  if(MODEL=="LeNet5"):
+def get_net(args):
+  if(args.MODEL=="LeNet5"):
       return LeNet5()
-  if(MODEL=="mobilenetV2"):
+  if(args.MODEL=="mobilenetV2"):
       return mobilenetV2()
 
 #DEFINE TEST FUNCTION

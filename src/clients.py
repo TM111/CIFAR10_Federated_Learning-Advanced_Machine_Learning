@@ -30,7 +30,7 @@ class Client():
 def get_clients_list(train_loader_list,args):
     clients_list=[]
     for i in range(args.NUM_CLIENTS):
-      net=get_net()
+      net=get_net(args)
       opt = torch.optim.SGD(net.parameters(), lr=args.LR, momentum=args.MOMENTUM)
       crt=nn.CrossEntropyLoss()
       client=Client(i,net,train_loader_list[str(i)],opt,crt,args)
