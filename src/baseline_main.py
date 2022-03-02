@@ -15,14 +15,17 @@ args = args_parser()
 if(args.COLAB==False):
     args.MODEL='LeNet5'
     args.DEVICE='cpu'
-    args.DISTRIBUTION=2
-    args.NUM_CLIENTS=1
+    args.CENTRALIZED_MODE=True
 
 if __name__ == '__main__':
     if(args.COLAB==True):
         args = args_parser()
-    if args.MODEL == 'LeNet5':
-        print("prova args")
+        
+    if(args.CENTRALIZED_MODE):
+        args.DISTRIBUTION=2
+        args.NUM_CLIENTS=1
+        args.NUM_SELECTED_CLIENTS=1
+        
     centralized_accuracy=9
     
     test_set, train_set, train_loader, test_loader =get_dataset(args)
