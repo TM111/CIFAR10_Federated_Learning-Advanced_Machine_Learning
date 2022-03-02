@@ -63,8 +63,8 @@ def print_weights(clients,main_model,args):   # test to view if the algotihm is 
       w.append(c.net.state_dict())
     w_avg=main_model.state_dict()
     
-    index=random.randint(0,len(w.keys())-1)
-    node=list(w.keys())[index]
+    index=random.randint(0,len(w_avg.keys())-1)
+    node=list(w_avg.keys())[index]
     s=''
     for i in range(len(clients)):
       s=s+str(i)+')'+'S:'+str(len(clients[i].train_loader.dataset))
