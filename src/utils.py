@@ -119,11 +119,11 @@ def train_clients(clients,args):
 
 
 #WEIGHTED ACCURACY
-def weighted_accuracy(clients):
+def weighted_accuracy(clients,args):
   sum=0
   num_samples=0
   for i in range(len(clients)):
-    test_loss, test_accuracy = evaluate(clients[i].net,clients[i].criterion, clients[i].test_loader)
+    test_loss, test_accuracy = evaluate(clients[i].net,clients[i].criterion, clients[i].test_loader,args)
     w=len(clients[i].train_loader.dataset)
     num_samples=num_samples+w
 
