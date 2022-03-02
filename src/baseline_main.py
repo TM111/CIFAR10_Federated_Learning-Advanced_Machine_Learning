@@ -32,7 +32,7 @@ if __name__ == '__main__':
         index=random.randint(0,len(w_avg.keys())-1)
         node=list(w_avg.keys())[index]
         print(node)
-        we=w_avg[node][0][0][0]
+        we=w_avg[node][0][0]
         print(we)
     test_set, train_set, train_loader, test_loader =get_dataset(args)
     
