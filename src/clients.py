@@ -33,7 +33,7 @@ def get_clients_list(train_loader_list,test_set, args):
       for data in train_loader_list[str(i)].dataset:
         if(data[1] not in classes):
           classes.append(data[1])
-      num_samples=int(len(train_loader_list[str(i)].dataset)*0.15)
+      num_samples=int(len(train_loader_list[str(i)].dataset)*0.2)
       test_loader=generated_test_distribution(classes, test_set,num_samples,args) #specific testset for each clients
       
       client=Client(i,net,train_loader_list[str(i)],opt,crt,test_loader)

@@ -135,7 +135,6 @@ def weighted_accuracy(clients,args):
 def select_clients(clients,args):
   for i in range(random.randint(2,7)):
     random.shuffle(clients)
-
   round_clients_list=[]
   for i in range(args.NUM_SELECTED_CLIENTS):
     round_clients_list.append(clients[i])

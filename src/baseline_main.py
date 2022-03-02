@@ -9,13 +9,14 @@ from models import get_net, evaluate
 import torch.optim
 import torch.nn as nn
 import time
+import random
 
 args = args_parser()
 if(args.COLAB==False):
     args.MODEL='LeNet5'
     args.DEVICE='cpu'
-    args.DISTRIBUTION=3
-    args.NUM_CLIENTS=2
+    args.DISTRIBUTION=2
+    args.NUM_CLIENTS=1
 
 if __name__ == '__main__':
     if(args.COLAB==True):
@@ -47,8 +48,11 @@ if __name__ == '__main__':
       
       
     clients_list=get_clients_list(train_loader_list,test_set,args)
-      
-    ind=2
+    
+    
+    for i in range(random.randint(2,7)):
+      random.shuffle(clients_list)
+    ind=0
     l=[0,0,0,0,0,0,0,0,0,0]
     for i in range(len(clients_list[ind].train_loader.dataset)):
       index=clients_list[ind].train_loader.dataset[i][1]
