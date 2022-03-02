@@ -6,7 +6,10 @@ import argparse
     
 def args_parser():
     parser = argparse.ArgumentParser()
-
+    
+    parser.add_argument('--DEVICE', type=str, default='cuda',
+                        help="number of rounds of training")
+    
     # federated arguments (Notation for the arguments followed from paper)
     parser.add_argument('--NUM_EPOCHS', type=int, default=1,
                         help="number of rounds of training")
