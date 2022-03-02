@@ -26,7 +26,7 @@ if __name__ == '__main__':
         args.NUM_SELECTED_CLIENTS=3
         
     centralized_accuracy=9
-
+    
     test_set, train_set, train_loader, test_loader =get_dataset(args)
     
     distribution=args.DISTRIBUTION
