@@ -20,10 +20,10 @@ if __name__ == '__main__':
     if(args.COLAB==True):
         args = args_parser()
         
-    if(args.CENTRALIZED_MODE):
+    if(args.CENTRALIZED_MODE==True):
         args.DISTRIBUTION=1
         args.NUM_CLIENTS=100
-        args.NUM_SELECTED_CLIENTS=2
+        args.NUM_SELECTED_CLIENTS=1
         
     centralized_accuracy=9
 
