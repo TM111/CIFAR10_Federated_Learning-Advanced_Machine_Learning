@@ -62,18 +62,20 @@ def print_weights(clients,main_model,args):   # test to view if the algotihm is 
     for c in clients:
       w.append(c.net.state_dict())
     w_avg=main_model.state_dict()
+    
     if(args.MODEL=='LeNet5'):
-      s=''
-      for i in range(len(clients)):
-        s=s+'size '+str(len(clients[i].train_loader.dataset))+' '+str(w[i]["conv1.weight"][0][0][0][0])+' '+str(clients[i].updates["conv1.weight"][0][0][0][0])+'     '
-      print(s)
-      print('avg '+str(w_avg["conv1.weight"][0][0][0][0]))
+      node="conv1.weight"
     elif(args.MODEL=='mobilenetV2'):
-      s=''
-      for i in range(len(clients)):
-        s=s+'size '+str(len(clients[i].train_loader.dataset))+' '+str(w[i]["features.2.conv.1.1.weight"][0])+'     '
-      print(s)
-      print('avg '+str(w_avg["features.2.conv.1.1.weight"][0]))
+      node="features.2.conv.1.1.weight"
+      
+    s=''
+    for i in range(len(clients)):
+      s=s+'size '+str(len(clients[i].train_loader.dataset))
+      we=str(round(w[i][node].tolist()[0][0][0][0],3))
+      u=str(round(clients[i].updates[node].tolist()[0][0][0][0],3))
+      s=s+' W:'+we+' U:'+u
+    print(s)
+    print('avg '+str(w_avg[node][0][0][0][0]))
 
 #MAIN MODEL -> CLIENTS
 def send_server_model_to_clients(main_model, clients):
