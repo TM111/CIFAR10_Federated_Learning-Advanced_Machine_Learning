@@ -99,7 +99,7 @@ if __name__ == '__main__':
       #TEST
       test_loss, main_model_accuracy = evaluate(server_model, server_criterion, test_loader,args)
       main_model_accuracy=round(main_model_accuracy,3)
-      w_accuracy=round(weighted_accuracy(clients_list),3)
+      w_accuracy=round(weighted_accuracy(clients_list,args),3)
       seconds=str(round(float(time.time() - start_time),2))
       print("After round "+str(i+1)+"  main model accuracy: "+str(main_model_accuracy)+"    weighted accuracy: "+str(w_accuracy)+"   time: "+seconds+" sec.")
     
