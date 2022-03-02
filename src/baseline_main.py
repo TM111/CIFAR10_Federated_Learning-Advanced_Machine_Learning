@@ -27,6 +27,13 @@ if __name__ == '__main__':
         
     centralized_accuracy=9
     
+    w_avg=get_net(args).state_dict()
+    for i in range(20):
+        index=random.randint(0,len(w_avg.keys())-1)
+        node=list(w_avg.keys())[index]
+        print(node)
+        we=w_avg[node][0][0][0]
+        print(we)
     test_set, train_set, train_loader, test_loader =get_dataset(args)
     
     distribution=args.DISTRIBUTION
