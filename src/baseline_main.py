@@ -25,9 +25,9 @@ if __name__ == '__main__':
     
     distribution=args.DISTRIBUTION
     alpha=args.ALPHA
-    print(alpha)
+    
     if(distribution==1):  # https://github.com/google-research/google-research/tree/master/federated_vision_datasets
-      train_user_images=dirichlet_distribution(alpha)
+      train_user_images=dirichlet_distribution(alpha,args)
     
     elif(distribution==2):
       train_user_images=cifar_iid(train_set,args)
@@ -37,15 +37,26 @@ if __name__ == '__main__':
      
         
     train_loader_list={}   #TRAIN LOADER DICT
-    print(train_user_images)
     for user_id in train_user_images.keys():
       dataset_ = torch.utils.data.Subset(train_set, train_user_images[user_id])
       dataloader = torch.utils.data.DataLoader(dataset=dataset_, batch_size=args.BATCH_SIZE, shuffle=False)
       train_loader_list[user_id]=dataloader
       
       
-    clients_list=get_clients_list(train_loader_list,args)
+    clients_list=get_clients_list(train_loader_list,test_set,args)
       
+    ind=2
+    l=[0,0,0,0,0,0,0,0,0,0]
+    for i in range(len(clients_list[ind].train_loader.dataset)):
+      index=clients_list[ind].train_loader.dataset[i][1]
+      l[index]=l[index]+1
+    print("Distribution of trainset for client "+str(ind),l)
+    
+    l=[0,0,0,0,0,0,0,0,0,0]
+    for i in range(len(clients_list[ind].test_loader.dataset)):
+      index=clients_list[ind].test_loader.dataset[i][1]
+      l[index]=l[index]+1
+    print("Distribution of testset for client  "+str(ind),l)
       
       
     print("Model: "+str(args.MODEL))
@@ -56,7 +67,7 @@ if __name__ == '__main__':
     print("-----------------------------------------")
     
     #INSTANCE MAIN MODEL
-    server_model=get_net()
+    server_model=get_net(args)
     server_optimizer = torch.optim.SGD(server_model.parameters(), lr=args.SERVER_LR, momentum=args.MOMENTUM)
     server_criterion = nn.CrossEntropyLoss()
     server_model = server_model.to(args.DEVICE)

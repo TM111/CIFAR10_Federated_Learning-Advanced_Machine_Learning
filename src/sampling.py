@@ -15,20 +15,24 @@ def cifar_parser(line, is_train=True):
     return image_id, class_id
 
 
-def dirichlet_distribution(alpha):    # generate trainset split from csv
+def dirichlet_distribution(alpha,args):    # generate trainset split from csv
   #download csv files
   url="http://storage.googleapis.com/gresearch/federated-vision-datasets/cifar10_v1.1.zip"
-  dir="/content/cifar10_csv"
+  if(args.COLAB):
+      dir="/content/cifar10_csv"
+  else:
+      dir=os.getcwd()+"/cifar10_csv"
+      print(dir)
   try:
     os.mkdir(dir)
   except:
     print("Folder already exist")
+    
+  urllib.request.urlretrieve(url, dir+"/cifar.zip")
+  with zipfile.ZipFile(dir+"/cifar.zip","r") as zip_ref:
+      zip_ref.extractall(dir)
 
-  urllib.request.urlretrieve(url, "/content/cifar10_csv/cifar.zip")
-  with zipfile.ZipFile("/content/cifar10_csv/cifar.zip","r") as zip_ref:
-      zip_ref.extractall("/content/cifar10_csv")
-
-  train_file="/content/cifar10_csv/federated_train_alpha_"+alpha+".csv"
+  train_file=dir+"/federated_train_alpha_"+alpha+".csv"
   """Inspects the federated train split."""
   print('Train file: %s' % train_file)
   if not path.exists(train_file):
