@@ -22,7 +22,6 @@ def dirichlet_distribution(alpha,args):    # generate trainset split from csv
       dir="/content/cifar10_csv"
   else:
       dir=os.getcwd()+"/cifar10_csv"
-      print(dir)
   try:
     os.mkdir(dir)
   except:
