@@ -33,7 +33,7 @@ def args_parser():
                         help="number of rounds of training")
     parser.add_argument('--NUM_CLIENTS', type=int, default=100,
                         help="number of rounds of training")
-    parser.add_argument('--NUM_SELECTED_CLIENTS', type=int, default=1,
+    parser.add_argument('--NUM_SELECTED_CLIENTS', type=int, default=3,
                         help="number of rounds of training")
     parser.add_argument('--ROUNDS', type=int, default=20,
                         help="number of rounds of training")

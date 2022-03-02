@@ -13,16 +13,17 @@ args = args_parser()
 if(args.COLAB==False):
     args.MODEL='LeNet5'
     args.DEVICE='cpu'
-    args.CENTRALIZED_MODE=False
+    args.DISTRIBUTION=3
+    args.CENTRALIZED_MODE=True
 
 if __name__ == '__main__':
     if(args.COLAB==True):
         args = args_parser()
         
     if(args.CENTRALIZED_MODE):
-        args.DISTRIBUTION=2
-        args.NUM_CLIENTS=1
-        args.NUM_SELECTED_CLIENTS=1
+        args.DISTRIBUTION=3
+        args.NUM_CLIENTS=10
+        args.NUM_SELECTED_CLIENTS=3
         
     centralized_accuracy=9
     
@@ -65,7 +66,6 @@ if __name__ == '__main__':
       index=clients_list[ind].test_loader.dataset[i][1]
       l[index]=l[index]+1
     print("Distribution of testset for client  "+str(ind),l)
-      
       
     print("Model: "+str(args.MODEL))
     print("Dataset distribution: "+str(distribution)+"  "+str(alpha)+" ("+str(args.NUM_CLASS_RANGE[0])+','+str(args.NUM_CLASS_RANGE[1])+')')

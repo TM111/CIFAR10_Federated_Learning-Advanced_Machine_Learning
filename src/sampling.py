@@ -59,16 +59,18 @@ def cifar_iid(train_set,args): # all clients have all classes with the same data
     classes_dict[label].append(i)
   classes_index=[]
   for label in classes_dict.keys():
+    for i in range(random.randint(2,7)):
+      random.shuffle(classes_dict[label])
     classes_index=classes_index+classes_dict[label]
 
-  count=0
+  client_id=0
   for i in classes_index:
-    if(str(count) not in user_images.keys()):
-      user_images[str(count)]=[]
-    user_images[str(count)].append(i)
-    count=count+1
-    if(count==args.NUM_CLIENTS):
-      count=0
+    if(str(client_id) not in user_images.keys()):
+      user_images[str(client_id)]=[]
+    user_images[str(client_id)].append(i)
+    client_id=client_id+1
+    if(client_id==args.NUM_CLIENTS):
+      client_id=0
   return user_images
 
 
@@ -97,7 +99,7 @@ def generated_test_distribution(classes, test_set, num_samples,args):    # gener
     for i in indexes:
       if(test_set[i][1]==c):
         test_user_images.append(i)
-      if(len(test_user_images)==int(num_samples/len(classes)+1)*count):
+      if(len(test_user_images)==int(num_samples/len(classes))*count):
         break
   dataset_ = torch.utils.data.Subset(test_set, test_user_images)
   dataloader = torch.utils.data.DataLoader(dataset=dataset_, batch_size=args.BATCH_SIZE, shuffle=False)

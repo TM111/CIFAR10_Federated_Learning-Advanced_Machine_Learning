@@ -52,7 +52,7 @@ def send_client_models_to_server_and_aggregate(main_model,clients,args):
 
   w=main_model.state_dict()
   for key in w.keys():
-    updates[key] = w[key]+args.SERVER_LR*updates[key]    # θt+1 ← θt - γgt
+    updates[key] = w[key]-args.SERVER_LR*updates[key]    # θt+1 ← θt - γgt
   main_model.load_state_dict(copy.deepcopy(updates))
   return main_model
 
@@ -65,7 +65,7 @@ def print_weights(clients,main_model,args):   # test to view if the algotihm is 
     if(args.MODEL=='LeNet5'):
       s=''
       for i in range(len(clients)):
-        s=s+'size '+str(len(clients[i].train_loader.dataset))+' '+str(w[i]["conv1.weight"][0][0][0][0])+'     '
+        s=s+'size '+str(len(clients[i].train_loader.dataset))+' '+str(w[i]["conv1.weight"][0][0][0][0])+' '+str(clients[i].updates["conv1.weight"][0][0][0][0])+'     '
       print(s)
       print('avg '+str(w_avg["conv1.weight"][0][0][0][0]))
     elif(args.MODEL=='mobilenetV2'):
@@ -89,7 +89,8 @@ def send_server_model_to_clients(main_model, clients):
 def train_clients(clients,args):
     for i in range(len(clients)): 
         clients[i].net = clients[i].net.to(args.DEVICE) # this will bring the network to GPU if DEVICE is cuda
-        previousW=copy.deepcopy(clients[i].net.state_dict())  #save the weights     θ ← θt
+        if(i==0):
+            previousW=copy.deepcopy(clients[i].net.state_dict())  #save the weights     θ ← θt
 
         cudnn.benchmark # Calling this optimizes runtime
         for epoch in range(clients[i].local_epoch):    
@@ -113,7 +114,7 @@ def train_clients(clients,args):
         #calculate update   Δθ ← θt - θ
         updates=clients[i].net.state_dict()
         for key in updates.keys():
-          updates[key] = updates[key]-previousW[key]
+          updates[key] = previousW[key] - updates[key]
         clients[i].updates=copy.deepcopy(updates)
     return clients
 
