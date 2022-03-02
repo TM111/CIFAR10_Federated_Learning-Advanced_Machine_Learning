@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# Python version: 3.6
+
 from sampling import dirichlet_distribution, cifar_iid, cifar_noniid
 from utils import get_dataset,send_server_model_to_clients, select_clients, train_clients, send_client_models_to_server_and_aggregate, print_weights, weighted_accuracy
 from options import args_parser
@@ -15,7 +13,7 @@ args = args_parser()
 if(args.COLAB==False):
     args.MODEL='LeNet5'
     args.DEVICE='cpu'
-    args.CENTRALIZED_MODE=True
+    args.CENTRALIZED_MODE=False
 
 if __name__ == '__main__':
     if(args.COLAB==True):
@@ -98,7 +96,7 @@ if __name__ == '__main__':
       server_model= send_client_models_to_server_and_aggregate(server_model,round_clients_list,args)
     
       #DEBUG
-      debug=0
+      debug=1
       if(debug):
         print("")
         print_weights(round_clients_list,server_model,args)
