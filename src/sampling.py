@@ -73,7 +73,7 @@ def cifar_iid(train_set,args): # all clients have all classes with the same data
 
 
 def cifar_noniid(train_set,args): # all clients have a number of class beetwen 1 and 4 with the same data distribution
-  user_images=cifar_iid()
+  user_images=cifar_iid(train_set,args)
   for key in user_images.keys():
     n_classes=random.randint(args.NUM_CLASS_RANGE[0],args.NUM_CLASS_RANGE[1])
     list_of_class=random.sample(range(0, args.NUM_CLASSES), n_classes)

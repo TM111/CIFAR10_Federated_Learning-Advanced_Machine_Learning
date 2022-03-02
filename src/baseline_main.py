@@ -13,6 +13,9 @@ import time
 args = args_parser()
 if(args.COLAB==False):
     args.MODEL='LeNet5'
+    args.DEVICE='cpu'
+    args.DISTRIBUTION=3
+    args.NUM_CLIENTS=2
 
 if __name__ == '__main__':
     if(args.COLAB==True):
