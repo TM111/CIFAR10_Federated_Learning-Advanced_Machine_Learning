@@ -75,7 +75,7 @@ def print_weights(clients,main_model,args):   # test to view if the algotihm is 
       u=str(round(clients[i].updates[node].tolist()[0][0][0][0],3))
       s=s+' W:'+we+' U:'+u+'   '
     print(s)
-    print('avg '+str(w_avg[node][0][0][0][0]))
+    print('AVG: '+str(round(w_avg[node].tolist()[0][0][0][0],3)))
 
 #MAIN MODEL -> CLIENTS
 def send_server_model_to_clients(main_model, clients):
