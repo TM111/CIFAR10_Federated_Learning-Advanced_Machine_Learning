@@ -8,10 +8,17 @@ import torch.optim
 import torch.nn as nn
 import time
 import random
-
-
+'''
+args = args_parser()
+if(args.COLAB==False):
+    args.MODEL='LeNet5'
+    args.DEVICE='cpu'
+    args.DISTRIBUTION=3
+    args.CENTRALIZED_MODE=True
+'''
 if __name__ == '__main__':
     args = args_parser()
+    print(args.CENTRALIZED_MODE)
     if(args.CENTRALIZED_MODE==True):
         args.DISTRIBUTION=1
         args.NUM_CLIENTS=100
