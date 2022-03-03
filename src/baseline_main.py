@@ -13,16 +13,16 @@ import random
 if __name__ == '__main__':
     args = args_parser()
     
-    if(args.COLAB==False):
+    if(args.COLAB==0):
         args.MODEL='LeNet5'
         args.DEVICE='cpu'
         args.DISTRIBUTION=3
-        args.CENTRALIZED_MODE=True
+        args.CENTRALIZED_MODE=1
         
     print(args.CENTRALIZED_MODE)
     print(args.COLAB)
     print(args.MODEL)
-    if(args.CENTRALIZED_MODE==True):
+    if(args.CENTRALIZED_MODE==1):
         args.DISTRIBUTION=1
         args.NUM_CLIENTS=100
         args.NUM_SELECTED_CLIENTS=1
