@@ -20,12 +20,12 @@ if __name__ == '__main__':
         args.CENTRALIZED_MODE=1
         
     if(args.CENTRALIZED_MODE==1):
-        args.DISTRIBUTION=1
-        args.NUM_CLIENTS=100
-        args.NUM_SELECTED_CLIENTS=1
+        args.DISTRIBUTION=3
+        args.NUM_CLIENTS=50
+        args.NUM_SELECTED_CLIENTS=3
         
     centralized_accuracy=9
-
+    
     test_set, train_set, train_loader, test_loader =get_dataset(args)
     
     distribution=args.DISTRIBUTION
@@ -86,22 +86,23 @@ if __name__ == '__main__':
       start_time = time.time()
     
       #SELECT CLEINTS
-      round_clients_list=select_clients(clients_list,args)
+      selected_clients_list=select_clients(clients_list,args)
     
       #TRAIN CLIENTS
-      round_clients_list=train_clients(round_clients_list,args)
+      selected_clients_list=train_clients(selected_clients_list,args)
     
       #CLIENTS -> MAIN MODEL & AVERAGE
-      server_model= send_client_models_to_server_and_aggregate(server_model,round_clients_list,args)
+      server_model= send_client_models_to_server_and_aggregate(server_model,selected_clients_list,args)
     
       #DEBUG
       debug=1
       if(debug):
         print("")
-        print_weights(round_clients_list,server_model,args)
+        print_weights(selected_clients_list,server_model,args)
     
       #MAIN MODEL -> CLIENTS
       clients_list=send_server_model_to_clients(server_model, clients_list)
+
     
       #TEST
       test_loss, main_model_accuracy = evaluate(server_model, server_criterion, test_loader,args)

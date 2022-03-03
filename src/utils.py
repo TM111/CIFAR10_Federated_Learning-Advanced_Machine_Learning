@@ -52,8 +52,8 @@ def send_client_models_to_server_and_aggregate(main_model,clients,args):
 
   w=main_model.state_dict()
   for key in w.keys():
-    updates[key] = w[key]-args.SERVER_LR*updates[key]    # θt+1 ← θt - γgt
-  main_model.load_state_dict(copy.deepcopy(updates))
+    w[key] = w[key]-args.SERVER_LR*updates[key]    # θt+1 ← θt - γgt
+  main_model.load_state_dict(copy.deepcopy(w))
   return main_model
 
 #PRINTS FOR DEBUG
@@ -67,15 +67,14 @@ def print_weights(clients,main_model,args):   # test to view if the algotihm is 
       node="conv1.weight"
     elif(args.MODEL=='mobilenetV2'):
       node="features.2.conv.1.1.weight"
-      
-    s=''
+
     for i in range(len(clients)):
-      s=s+str(i)+')'+'S:'+str(len(clients[i].train_loader.dataset))
-      we=str(round(w[i][node].tolist()[0][0][0][0],3))
-      u=str(round(clients[i].updates[node].tolist()[0][0][0][0],3))
+      s=str(i+1)+')'+'S:'+str(len(clients[i].train_loader.dataset))
+      we=str(round(torch.sum(w[i][node]).tolist(),3))
+      u=str(round(torch.sum(clients[i].updates[node]).tolist(),3))
       s=s+' W:'+we+' U:'+u+' '
-    print(s)
-    print('avg '+str(w_avg[node][0][0][0][0]))
+      print(s)
+    print('avg '+str(torch.sum(w_avg[node]).tolist()))
 
 #MAIN MODEL -> CLIENTS
 def send_server_model_to_clients(main_model, clients):
@@ -89,11 +88,10 @@ def send_server_model_to_clients(main_model, clients):
 
 #TRAIN ALL CLIENTS
 def train_clients(clients,args):
+    previousW=copy.deepcopy(clients[0].net.state_dict())  #save the weights     θ ← θt
+    
     for i in range(len(clients)): 
         clients[i].net = clients[i].net.to(args.DEVICE) # this will bring the network to GPU if DEVICE is cuda
-        if(i==0):
-            previousW=copy.deepcopy(clients[i].net.state_dict())  #save the weights     θ ← θt
-
         cudnn.benchmark # Calling this optimizes runtime
         for epoch in range(clients[i].local_epoch):    
             for images, labels in clients[i].train_loader:
