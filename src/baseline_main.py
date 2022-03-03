@@ -9,16 +9,16 @@ import torch.nn as nn
 import time
 import random
 
-args = args_parser()
-if(args.COLAB==False):
-    args.MODEL='LeNet5'
-    args.DEVICE='cpu'
-    args.DISTRIBUTION=3
-    args.CENTRALIZED_MODE=True
     
 if __name__ == '__main__':
-    if(args.COLAB):
-        args = args_parser()
+    args = args_parser()
+    
+    if(args.COLAB==False):
+        args.MODEL='LeNet5'
+        args.DEVICE='cpu'
+        args.DISTRIBUTION=3
+        args.CENTRALIZED_MODE=True
+        
     print(args.CENTRALIZED_MODE)
     if(args.CENTRALIZED_MODE==True):
         args.DISTRIBUTION=1
