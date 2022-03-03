@@ -21,6 +21,7 @@ if __name__ == '__main__':
         
     print(args.CENTRALIZED_MODE)
     print(args.COLAB)
+    print(args.MODEL)
     if(args.CENTRALIZED_MODE==True):
         args.DISTRIBUTION=1
         args.NUM_CLIENTS=100
