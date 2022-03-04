@@ -1,6 +1,8 @@
-
 import argparse
     
+
+
+
 def args_parser():
     parser = argparse.ArgumentParser()
     
@@ -47,3 +49,5 @@ def args_parser():
 
     args = parser.parse_args()
     return args
+
+ARGS=args_parser()

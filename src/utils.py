@@ -1,20 +1,23 @@
 from torchvision import transforms as transforms
 import torchvision
+import torchvision.datasets
 import torch
 import copy
 import random
 import torch.backends.cudnn as cudnn
 from models import evaluate
+from options import ARGS
 
-def get_dataset(args):
+
+def get_dataset():
     train_transform =  transforms.Compose([transforms.ToTensor()])
     test_transform = transforms.Compose([transforms.ToTensor()])
 
     train_set = torchvision.datasets.CIFAR10(root='./CIFAR10', train=True, download=True, transform=train_transform)
     test_set = torchvision.datasets.CIFAR10(root='./CIFAR10', train=False, download=True, transform=test_transform)
-
-    train_loader = torch.utils.data.DataLoader(dataset=train_set, batch_size=args.BATCH_SIZE, shuffle=False)
-    test_loader = torch.utils.data.DataLoader(dataset=test_set, batch_size=args.BATCH_SIZE, shuffle=False)
+    print(ARGS)
+    train_loader = torch.utils.data.DataLoader(dataset=train_set, batch_size=ARGS.BATCH_SIZE, shuffle=False)
+    test_loader = torch.utils.data.DataLoader(dataset=test_set, batch_size=ARGS.BATCH_SIZE, shuffle=False)
     
     # Check dataset sizes
     print('Train Dataset: {}'.format(len(train_set)))
@@ -43,7 +46,7 @@ def average_weights(updates,clients):           # AggregateClient()
 
 
 #CLIENTS -> MAIN MODEL & AVERAGE
-def send_client_models_to_server_and_aggregate(main_model,clients,args):
+def send_client_models_to_server_and_aggregate(main_model,clients):
   local_updates=[]
   for c in clients:
     local_updates.append(copy.deepcopy(c.updates))
@@ -52,20 +55,20 @@ def send_client_models_to_server_and_aggregate(main_model,clients,args):
 
   w=main_model.state_dict()
   for key in w.keys():
-    w[key] = w[key]-args.SERVER_LR*updates[key]    # θt+1 ← θt - γgt
+    w[key] = w[key]-ARGS.SERVER_LR*updates[key]    # θt+1 ← θt - γgt
   main_model.load_state_dict(copy.deepcopy(w))
   return main_model
 
 #PRINTS FOR DEBUG
-def print_weights(clients,main_model,args):   # test to view if the algotihm is correct
+def print_weights(clients,main_model):   # test to view if the algotihm is correct
     w=[]
     for c in clients:
       w.append(c.net.state_dict())
     w_avg=main_model.state_dict()
     
-    if(args.MODEL=='LeNet5'):
+    if(ARGS.MODEL=='LeNet5'):
       node="conv1.weight"
-    elif(args.MODEL=='mobilenetV2'):
+    elif(ARGS.MODEL=='mobilenetV2'):
       node="features.2.conv.1.1.weight"
 
     for i in range(len(clients)):
@@ -87,17 +90,17 @@ def send_server_model_to_clients(main_model, clients):
 
 
 #TRAIN ALL CLIENTS
-def train_clients(clients,args):
+def train_clients(clients):
     previousW=copy.deepcopy(clients[0].net.state_dict())  #save the weights     θ ← θt
     
     for i in range(len(clients)): 
-        clients[i].net = clients[i].net.to(args.DEVICE) # this will bring the network to GPU if DEVICE is cuda
+        clients[i].net = clients[i].net.to(ARGS.DEVICE) # this will bring the network to GPU if DEVICE is cuda
         cudnn.benchmark # Calling this optimizes runtime
         for epoch in range(clients[i].local_epoch):    
             for images, labels in clients[i].train_loader:
               # Bring data over the device of choice
-              images = images.to(args.DEVICE)
-              labels = labels.to(args.DEVICE)
+              images = images.to(ARGS.DEVICE)
+              labels = labels.to(ARGS.DEVICE)
 
               clients[i].net.train() # Sets module in training mode
 
@@ -120,11 +123,11 @@ def train_clients(clients,args):
 
 
 #WEIGHTED ACCURACY
-def weighted_accuracy(clients,args):
+def weighted_accuracy(clients):
   sum=0
   num_samples=0
   for i in range(len(clients)):
-    test_loss, test_accuracy = evaluate(clients[i].net,clients[i].criterion, clients[i].test_loader,args)
+    test_loss, test_accuracy = evaluate(clients[i].net,clients[i].criterion, clients[i].test_loader)
     w=len(clients[i].train_loader.dataset)
     num_samples=num_samples+w
 
@@ -133,10 +136,10 @@ def weighted_accuracy(clients,args):
 
 
 #SELECT CLIENTS
-def select_clients(clients,args):
+def select_clients(clients):
   for i in range(random.randint(2,7)):
     random.shuffle(clients)
   round_clients_list=[]
-  for i in range(args.NUM_SELECTED_CLIENTS):
+  for i in range(ARGS.NUM_SELECTED_CLIENTS):
     round_clients_list.append(clients[i])
   return round_clients_list

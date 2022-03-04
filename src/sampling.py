@@ -5,6 +5,7 @@ import os
 import urllib.request 
 import zipfile
 import random
+from options import ARGS
 
 def cifar_parser(line, is_train=True):
   if is_train:
@@ -15,10 +16,10 @@ def cifar_parser(line, is_train=True):
     return image_id, class_id
 
 
-def dirichlet_distribution(alpha,args):    # generate trainset split from csv
+def dirichlet_distribution(alpha):    # generate trainset split from csv
   #download csv files
   url="http://storage.googleapis.com/gresearch/federated-vision-datasets/cifar10_v1.1.zip"
-  if(args.COLAB):
+  if(ARGS.COLAB):
       dir="/content/cifar10_csv"
   else:
       dir=os.getcwd()+"/cifar10_csv"
@@ -49,7 +50,7 @@ def dirichlet_distribution(alpha,args):    # generate trainset split from csv
   return user_images
 
 
-def cifar_iid(train_set,args): # all clients have all classes with the same data distribution
+def cifar_iid(train_set): # all clients have all classes with the same data distribution
   user_images={}
   classes_dict={}
   for i in range(len(train_set)):
@@ -69,16 +70,16 @@ def cifar_iid(train_set,args): # all clients have all classes with the same data
       user_images[str(client_id)]=[]
     user_images[str(client_id)].append(i)
     client_id=client_id+1
-    if(client_id==args.NUM_CLIENTS):
+    if(client_id==ARGS.NUM_CLIENTS):
       client_id=0
   return user_images
 
 
-def cifar_noniid(train_set,args): # all clients have a number of class beetwen 1 and 4 with the same data distribution
-  user_images=cifar_iid(train_set,args)
+def cifar_noniid(train_set): # all clients have a number of class beetwen 1 and 4 with the same data distribution
+  user_images=cifar_iid(train_set)
   for key in user_images.keys():
-    n_classes=random.randint(args.NUM_CLASS_RANGE[0],args.NUM_CLASS_RANGE[1])
-    list_of_class=random.sample(range(0, args.NUM_CLASSES), n_classes)
+    n_classes=random.randint(ARGS.NUM_CLASS_RANGE[0],ARGS.NUM_CLASS_RANGE[1])
+    list_of_class=random.sample(range(0, ARGS.NUM_CLASSES), n_classes)
     new_index_list=[]
     for i in user_images[key]:
       label=int(train_set[i][1])
@@ -88,7 +89,7 @@ def cifar_noniid(train_set,args): # all clients have a number of class beetwen 1
   return user_images
 
 
-def generated_test_distribution(classes, test_set, num_samples,args):    # generate testset with specific class and size
+def generated_test_distribution(classes, test_set, num_samples):    # generate testset with specific class and size
   test_user_images=[]
   count=0
   for c in classes:
@@ -102,5 +103,5 @@ def generated_test_distribution(classes, test_set, num_samples,args):    # gener
       if(len(test_user_images)==int(num_samples/len(classes))*count):
         break
   dataset_ = torch.utils.data.Subset(test_set, test_user_images)
-  dataloader = torch.utils.data.DataLoader(dataset=dataset_, batch_size=args.BATCH_SIZE, shuffle=False)
+  dataloader = torch.utils.data.DataLoader(dataset=dataset_, batch_size=ARGS.BATCH_SIZE, shuffle=False)
   return dataloader

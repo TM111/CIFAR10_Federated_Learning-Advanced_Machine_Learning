@@ -2,6 +2,7 @@ import torch.nn as nn
 from statistics import mean 
 import torch.nn.functional as func
 import torch.hub
+from options import ARGS
 
 #DEFINE NETWORKS
 class LeNet5(nn.Module):

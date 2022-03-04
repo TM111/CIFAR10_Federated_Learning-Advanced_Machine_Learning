@@ -2,6 +2,7 @@ from sampling import generated_test_distribution
 from models import get_net
 import torch.optim
 import torch.nn as nn
+from options import ARGS
 
 #Client datastructure
 class Client():
@@ -22,11 +23,11 @@ class Client():
         
 
 #Istance list of clients
-def get_clients_list(train_loader_list,test_set, args):
+def get_clients_list(train_loader_list,test_set):
     clients_list=[]
-    for i in range(args.NUM_CLIENTS):
-      net=get_net(args)
-      opt = torch.optim.SGD(net.parameters(), lr=args.LR, momentum=args.MOMENTUM)
+    for i in range(ARGS.NUM_CLIENTS):
+      net=get_net()
+      opt = torch.optim.SGD(net.parameters(), lr=ARGS.LR, momentum=ARGS.MOMENTUM)
       crt=nn.CrossEntropyLoss()
       
       classes=[]
@@ -34,7 +35,7 @@ def get_clients_list(train_loader_list,test_set, args):
         if(data[1] not in classes):
           classes.append(data[1])
       num_samples=int(len(train_loader_list[str(i)].dataset)*0.2)
-      test_loader=generated_test_distribution(classes, test_set,num_samples,args) #specific testset for each clients
+      test_loader=generated_test_distribution(classes, test_set,num_samples) #specific testset for each clients
       
       client=Client(i,net,train_loader_list[str(i)],opt,crt,test_loader)
       clients_list.append(client)
