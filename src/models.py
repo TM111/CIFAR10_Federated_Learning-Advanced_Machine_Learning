@@ -30,23 +30,23 @@ def mobilenetV2(pretrain=True):
   model = torch.hub.load('pytorch/vision:v0.10.0', 'mobilenet_v2', pretrained=pretrain)
   return model
 
-def get_net(args):
-  if(args.MODEL=="LeNet5"):
+def get_net():
+  if(ARGS.MODEL=="LeNet5"):
       return LeNet5()
-  if(args.MODEL=="mobilenetV2"):
+  if(ARGS.MODEL=="mobilenetV2"):
       return mobilenetV2()
 
 #DEFINE TEST FUNCTION
-def evaluate(net, criterion,dataloader, args, print_tqdm = True):
+def evaluate(net, criterion,dataloader, print_tqdm = True):
   with torch.no_grad():
-    net = net.to(args.DEVICE) # this will bring the network to GPU if DEVICE is cuda
+    net = net.to(ARGS.DEVICE) # this will bring the network to GPU if DEVICE is cuda
     net.train(False) # Set Network to evaluation mode
     running_corrects = 0
     #iterable = tqdm(dataloader) if print_tqdm else dataloader
     losses = []
     for images, labels in dataloader: 
-      images = images.to(args.DEVICE)
-      labels = labels.to(args.DEVICE)
+      images = images.to(ARGS.DEVICE)
+      labels = labels.to(ARGS.DEVICE)
       # Forward Pass
       outputs = net(images)
       loss = criterion(outputs, labels)

@@ -15,7 +15,7 @@ def get_dataset():
 
     train_set = torchvision.datasets.CIFAR10(root='./CIFAR10', train=True, download=True, transform=train_transform)
     test_set = torchvision.datasets.CIFAR10(root='./CIFAR10', train=False, download=True, transform=test_transform)
-    print(ARGS)
+
     train_loader = torch.utils.data.DataLoader(dataset=train_set, batch_size=ARGS.BATCH_SIZE, shuffle=False)
     test_loader = torch.utils.data.DataLoader(dataset=test_set, batch_size=ARGS.BATCH_SIZE, shuffle=False)
     
@@ -77,7 +77,7 @@ def print_weights(clients,main_model):   # test to view if the algotihm is corre
       u=str(round(torch.sum(clients[i].updates[node]).tolist(),3))
       s=s+' W:'+we+' U:'+u+' '
       print(s)
-    print('avg '+str(torch.sum(w_avg[node]).tolist()))
+    print('avg '+str(round(torch.sum(w_avg[node]).tolist(),4)))
 
 #MAIN MODEL -> CLIENTS
 def send_server_model_to_clients(main_model, clients):

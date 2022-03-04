@@ -1,7 +1,7 @@
 
 from sampling import dirichlet_distribution, cifar_iid, cifar_noniid
 from utils import get_dataset,send_server_model_to_clients, select_clients, train_clients, send_client_models_to_server_and_aggregate, print_weights, weighted_accuracy
-from options import args_parser, ARGS
+from options import ARGS
 from clients import get_clients_list
 from models import get_net, evaluate
 import torch.optim
@@ -10,19 +10,17 @@ import time
 import random
     
 if __name__ == '__main__':
-    print(ARGS)
     if(ARGS.COLAB==0): #test locally
         ARGS.MODEL='LeNet5'
         ARGS.DEVICE='cpu'
         ARGS.DISTRIBUTION=3
         ARGS.CENTRALIZED_MODE=1
         
+        
     if(ARGS.CENTRALIZED_MODE==1):
         ARGS.DISTRIBUTION=3
         ARGS.NUM_CLIENTS=50
         ARGS.NUM_SELECTED_CLIENTS=3
-        
-    centralized_accuracy=9
     
     test_set, train_set, train_loader, test_loader = get_dataset()
     
@@ -112,6 +110,5 @@ if __name__ == '__main__':
     print("-----------------------------------------")
     print("Final Accuracy of Main Model Federated Learning: "+str(main_model_accuracy))
     print("Final Weighted Accuracy of Federated Learning: "+str(w_accuracy))
-    print("Final Accuracy of standard approach: "+str(centralized_accuracy))
     print("//////////////////////////////////////////////////////////////////")
     print("")
