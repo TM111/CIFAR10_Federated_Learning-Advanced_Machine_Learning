@@ -89,7 +89,7 @@ if __name__ == '__main__':
       server_model= send_client_models_to_server_and_aggregate(server_model,selected_clients_list)
     
       #DEBUG
-      debug=1
+      debug=0
       if(debug):
         print("")
         print_weights(selected_clients_list,server_model)
