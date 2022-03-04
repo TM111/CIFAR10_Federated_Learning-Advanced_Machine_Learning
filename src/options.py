@@ -26,7 +26,7 @@ def args_parser():
                         help="number of rounds of training")
     parser.add_argument('--DISTRIBUTION', type=int, default=1,
                         help="number of rounds of training")
-    parser.add_argument('--ALPHA', type=str, default='0.50',
+    parser.add_argument('--ALPHA', type=float, default=0.5,
                         help="number of rounds of training")
     parser.add_argument('--NUM_CLASS_RANGE', type=list, default=[1,7],
                         help="number of rounds of training")

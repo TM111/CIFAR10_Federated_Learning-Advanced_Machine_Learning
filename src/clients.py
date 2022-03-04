@@ -20,7 +20,7 @@ class Client():
         
 
 #Istance list of clients
-def get_clients_list(train_loader_list,test_set):
+def get_clients_list(train_loader_list, test_set):
     clients_list=[]
     for i in range(ARGS.NUM_CLIENTS):
       net=get_net()

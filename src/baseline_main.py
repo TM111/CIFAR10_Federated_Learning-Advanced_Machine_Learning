@@ -13,14 +13,15 @@ if __name__ == '__main__':
     if(ARGS.COLAB==0): #test locally
         ARGS.MODEL='LeNet5'
         ARGS.DEVICE='cpu'
-        ARGS.DISTRIBUTION=3
+        ARGS.DISTRIBUTION=1
+        ARGS.ALPHA=100
         ARGS.CENTRALIZED_MODE=1
+        ARGS.NUM_CLIENTS=25
+        ARGS.NUM_SELECTED_CLIENTS=3
         
         
     if(ARGS.CENTRALIZED_MODE==1):
-        ARGS.DISTRIBUTION=1
-        ARGS.NUM_CLIENTS=50
-        ARGS.NUM_SELECTED_CLIENTS=3
+        asd=0
     
     test_set, train_set, train_loader, test_loader = get_dataset()
     
@@ -58,12 +59,7 @@ if __name__ == '__main__':
       index=clients_list[ind].test_loader.dataset[i][1]
       l[index]=l[index]+1
     print("Distribution of testset for client  "+str(ind),l)
-      
-    
-    
-    
-    
-    
+
     print("Model: "+str(ARGS.MODEL))
     print("Dataset distribution: "+str(ARGS.DISTRIBUTION)+"  "+str(ARGS.ALPHA)+" ("+str(ARGS.NUM_CLASS_RANGE[0])+','+str(ARGS.NUM_CLASS_RANGE[1])+')')
     print("Number of clients: "+str(ARGS.NUM_CLIENTS))

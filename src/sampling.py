@@ -31,8 +31,9 @@ def dirichlet_distribution():    # generate trainset split from csv
   urllib.request.urlretrieve(url, dir+"/cifar.zip")
   with zipfile.ZipFile(dir+"/cifar.zip","r") as zip_ref:
       zip_ref.extractall(dir)
-
-  train_file=dir+"/federated_train_alpha_"+ARGS.ALPHA+".csv"
+  
+  alpha=str("{:.2f}".format(ARGS.ALPHA))
+  train_file=dir+"/federated_train_alpha_"+alpha+".csv"
   """Inspects the federated train split."""
   print('Train file: %s' % train_file)
   if not path.exists(train_file):

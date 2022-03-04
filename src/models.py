@@ -37,7 +37,7 @@ def get_net():
       return mobilenetV2()
 
 #DEFINE TEST FUNCTION
-def evaluate(net, criterion,dataloader, print_tqdm = True):
+def evaluate(net, criterion,dataloader):
   with torch.no_grad():
     net = net.to(ARGS.DEVICE) # this will bring the network to GPU if DEVICE is cuda
     net.train(False) # Set Network to evaluation mode
