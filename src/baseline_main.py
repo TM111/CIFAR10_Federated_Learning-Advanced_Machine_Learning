@@ -18,25 +18,22 @@ if __name__ == '__main__':
         
         
     if(ARGS.CENTRALIZED_MODE==1):
-        ARGS.DISTRIBUTION=3
+        ARGS.DISTRIBUTION=1
         ARGS.NUM_CLIENTS=50
         ARGS.NUM_SELECTED_CLIENTS=3
     
     test_set, train_set, train_loader, test_loader = get_dataset()
     
-    distribution=ARGS.DISTRIBUTION
-    alpha=ARGS.ALPHA
     
-    if(distribution==1):  # https://github.com/google-research/google-research/tree/master/federated_vision_datasets
-      train_user_images=dirichlet_distribution(alpha)
+    if(ARGS.DISTRIBUTION==1):  # https://github.com/google-research/google-research/tree/master/federated_vision_datasets
+      train_user_images=dirichlet_distribution()
     
-    elif(distribution==2):
+    elif(ARGS.DISTRIBUTION==2):
       train_user_images=cifar_iid(train_set)
     
-    elif(distribution==3):  # https://towardsdatascience.com/preserving-data-privacy-in-deep-learning-part-2-6c2e9494398b
+    elif(ARGS.DISTRIBUTION==3):  # https://towardsdatascience.com/preserving-data-privacy-in-deep-learning-part-2-6c2e9494398b
       train_user_images=cifar_noniid(train_set)
      
-
     train_loader_list={}   #TRAIN LOADER DICT
     for user_id in train_user_images.keys():
       dataset_ = torch.utils.data.Subset(train_set, train_user_images[user_id])
@@ -62,14 +59,19 @@ if __name__ == '__main__':
       l[index]=l[index]+1
     print("Distribution of testset for client  "+str(ind),l)
       
+    
+    
+    
+    
+    
     print("Model: "+str(ARGS.MODEL))
-    print("Dataset distribution: "+str(distribution)+"  "+str(alpha)+" ("+str(ARGS.NUM_CLASS_RANGE[0])+','+str(ARGS.NUM_CLASS_RANGE[1])+')')
+    print("Dataset distribution: "+str(ARGS.DISTRIBUTION)+"  "+str(ARGS.ALPHA)+" ("+str(ARGS.NUM_CLASS_RANGE[0])+','+str(ARGS.NUM_CLASS_RANGE[1])+')')
     print("Number of clients: "+str(ARGS.NUM_CLIENTS))
     print("Number of selected clients: "+str(ARGS.NUM_SELECTED_CLIENTS))
     print("Number of rounds: "+str(ARGS.ROUNDS))
     print("-----------------------------------------")
     
-    #INSTANCE MAIN MODEL
+    #INSTANCE SERVER MODEL
     server_model=get_net()
     server_optimizer = torch.optim.SGD(server_model.parameters(), lr=ARGS.SERVER_LR, momentum=ARGS.MOMENTUM)
     server_criterion = nn.CrossEntropyLoss()
@@ -87,7 +89,7 @@ if __name__ == '__main__':
       #TRAIN CLIENTS
       selected_clients_list=train_clients(selected_clients_list)
     
-      #CLIENTS -> MAIN MODEL & AVERAGE
+      #CLIENTS -> SERVER MODEL & AVERAGE
       server_model= send_client_models_to_server_and_aggregate(server_model,selected_clients_list)
     
       #DEBUG
@@ -96,7 +98,7 @@ if __name__ == '__main__':
         print("")
         print_weights(selected_clients_list,server_model)
     
-      #MAIN MODEL -> CLIENTS
+      #SERVER MODEL -> CLIENTS
       clients_list=send_server_model_to_clients(server_model, clients_list)
 
     

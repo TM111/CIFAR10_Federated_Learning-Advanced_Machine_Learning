@@ -45,26 +45,26 @@ def average_weights(updates,clients):           # AggregateClient()
     return updates_avg
 
 
-#CLIENTS -> MAIN MODEL & AVERAGE
-def send_client_models_to_server_and_aggregate(main_model,clients):
+#CLIENTS -> SERVER MODEL & AVERAGE
+def send_client_models_to_server_and_aggregate(server_model,clients):
   local_updates=[]
   for c in clients:
     local_updates.append(copy.deepcopy(c.updates))
 
   updates = average_weights(local_updates,clients) # AggregateClient()
 
-  w=main_model.state_dict()
+  w=server_model.state_dict()
   for key in w.keys():
     w[key] = w[key]-ARGS.SERVER_LR*updates[key]    # θt+1 ← θt - γgt
-  main_model.load_state_dict(copy.deepcopy(w))
-  return main_model
+  server_model.load_state_dict(copy.deepcopy(w))
+  return server_model
 
 #PRINTS FOR DEBUG
-def print_weights(clients,main_model):   # test to view if the algotihm is correct
+def print_weights(clients,server_model):   # test to view if the algotihm is correct
     w=[]
     for c in clients:
       w.append(c.net.state_dict())
-    w_avg=main_model.state_dict()
+    w_avg=server_model.state_dict()
     
     if(ARGS.MODEL=='LeNet5'):
       node="conv1.weight"
@@ -79,7 +79,7 @@ def print_weights(clients,main_model):   # test to view if the algotihm is corre
       print(s)
     print('avg '+str(round(torch.sum(w_avg[node]).tolist(),4)))
 
-#MAIN MODEL -> CLIENTS
+#SERVER MODEL -> CLIENTS
 def send_server_model_to_clients(main_model, clients):
     with torch.no_grad():
       w=main_model.state_dict()

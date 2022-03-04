@@ -16,7 +16,7 @@ def cifar_parser(line, is_train=True):
     return image_id, class_id
 
 
-def dirichlet_distribution(alpha):    # generate trainset split from csv
+def dirichlet_distribution():    # generate trainset split from csv
   #download csv files
   url="http://storage.googleapis.com/gresearch/federated-vision-datasets/cifar10_v1.1.zip"
   if(ARGS.COLAB):
@@ -32,7 +32,7 @@ def dirichlet_distribution(alpha):    # generate trainset split from csv
   with zipfile.ZipFile(dir+"/cifar.zip","r") as zip_ref:
       zip_ref.extractall(dir)
 
-  train_file=dir+"/federated_train_alpha_"+alpha+".csv"
+  train_file=dir+"/federated_train_alpha_"+ARGS.ALPHA+".csv"
   """Inspects the federated train split."""
   print('Train file: %s' % train_file)
   if not path.exists(train_file):
