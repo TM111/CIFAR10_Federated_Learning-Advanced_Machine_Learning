@@ -1,4 +1,3 @@
-
 from sampling import dirichlet_distribution, cifar_iid, cifar_noniid
 from utils import get_dataset,send_server_model_to_clients, select_clients, train_clients, send_client_updates_to_server_and_aggregate, print_weights, weighted_accuracy
 from options import ARGS
