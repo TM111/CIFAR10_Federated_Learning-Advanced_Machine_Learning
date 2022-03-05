@@ -16,7 +16,7 @@ class Client():
         self.criterion=criterion
         self.local_epoch=local_epoch
         
-        self.updates=0    #Δθ memorizes the updates after training
+        self.updates=None    #Δθ memorizes the updates after training
         
 
 #Istance list of clients

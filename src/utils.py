@@ -25,11 +25,13 @@ def get_dataset():
     return test_set, train_set, train_loader, test_loader
 
 
-#https://github.com/AshwinRJ/Federated-Learning-PyTorch/blob/master/src/utils.py
 
-#Calculate AVG for each clients layers
+
+
+
+#https://github.com/AshwinRJ/Federated-Learning-PyTorch/blob/master/src/utils.py
+#Calculate AVG for each clients updates
 def average_weights(updates,clients):           # AggregateClient()
-    #IMPLEMENTATION OF FEDAVG
     total_samples=0
     for c in clients:
       total_samples=total_samples+len(c.train_loader.dataset)
@@ -45,19 +47,33 @@ def average_weights(updates,clients):           # AggregateClient()
     return updates_avg
 
 
-#CLIENTS -> SERVER MODEL & AVERAGE
-def send_client_models_to_server_and_aggregate(server_model,clients):
+
+
+previous_updates=None   #vt-1  for FedAvgM algorithm
+#CLIENTS UPDATES -> SERVER & AVERAGE
+def send_client_updates_to_server_and_aggregate(server_model,clients):
   local_updates=[]
   for c in clients:
     local_updates.append(copy.deepcopy(c.updates))
 
   updates = average_weights(local_updates,clients) # AggregateClient()
+  
+  if(ARGS.ALGORITHM=='FedAvgM'):
+      global previous_updates
+      if(previous_updates is not None):
+          for key in updates.keys():
+              updates[key]=ARGS.SERVER_MOMENTUM*previous_updates[key] + updates[key]
+      previous_updates=copy.deepcopy(updates)
 
   w=server_model.state_dict()
   for key in w.keys():
     w[key] = w[key]-ARGS.SERVER_LR*updates[key]    # θt+1 ← θt - γgt
   server_model.load_state_dict(copy.deepcopy(w))
   return server_model
+
+
+
+
 
 #PRINTS FOR DEBUG
 def print_weights(clients,server_model):   # test to view if the algotihm is correct
@@ -79,6 +95,10 @@ def print_weights(clients,server_model):   # test to view if the algotihm is cor
       print(s)
     print('avg '+str(round(torch.sum(w_avg[node]).tolist(),4)))
 
+
+
+
+
 #SERVER MODEL -> CLIENTS
 def send_server_model_to_clients(main_model, clients):
     with torch.no_grad():
@@ -86,6 +106,9 @@ def send_server_model_to_clients(main_model, clients):
       for i in range(len(clients)):
         clients[i].net.load_state_dict(copy.deepcopy(w))
     return clients
+
+
+
 
 
 
@@ -122,6 +145,10 @@ def train_clients(clients):
     return clients
 
 
+
+
+
+
 #WEIGHTED ACCURACY
 def weighted_accuracy(clients):
   sum=0
@@ -131,6 +158,10 @@ def weighted_accuracy(clients):
     sum=sum+accuracy*len(clients[i].train_loader.dataset)
     num_samples=num_samples+len(clients[i].train_loader.dataset)
   return sum/num_samples
+
+
+
+
 
 
 #SELECT CLIENTS

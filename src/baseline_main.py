@@ -1,6 +1,6 @@
 
 from sampling import dirichlet_distribution, cifar_iid, cifar_noniid
-from utils import get_dataset,send_server_model_to_clients, select_clients, train_clients, send_client_models_to_server_and_aggregate, print_weights, weighted_accuracy
+from utils import get_dataset,send_server_model_to_clients, select_clients, train_clients, send_client_updates_to_server_and_aggregate, print_weights, weighted_accuracy
 from options import ARGS
 from clients import get_clients_list
 from models import get_net, evaluate
@@ -13,6 +13,8 @@ if __name__ == '__main__':
     if(ARGS.COLAB==0): #test locally
         ARGS.MODEL='LeNet5'
         ARGS.DEVICE='cpu'
+        ARGS.ALGORITHM='FedAvgM'
+        ARGS.SERVER_MOMENTUM=0.5
         ARGS.DISTRIBUTION=1
         ARGS.ALPHA=100
         ARGS.CENTRALIZED_MODE=1
@@ -73,7 +75,7 @@ if __name__ == '__main__':
     server_criterion = nn.CrossEntropyLoss()
     server_model = server_model.to(ARGS.DEVICE)
     
-    #MAIN MODEL -> CLIENTS
+    #SERVER MODEL -> CLIENTS
     clients_list=send_server_model_to_clients(server_model, clients_list)
     
     for i in range(ARGS.ROUNDS):
@@ -85,11 +87,11 @@ if __name__ == '__main__':
       #TRAIN CLIENTS
       selected_clients_list=train_clients(selected_clients_list)
     
-      #CLIENTS -> SERVER MODEL & AVERAGE
-      server_model= send_client_models_to_server_and_aggregate(server_model,selected_clients_list)
+      #CLIENTS UPDATES -> SERVER & AVERAGE
+      server_model= send_client_updates_to_server_and_aggregate(server_model,selected_clients_list)
     
       #DEBUG
-      debug=0
+      debug=1
       if(debug):
         print("")
         print_weights(selected_clients_list,server_model)
