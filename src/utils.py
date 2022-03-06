@@ -22,7 +22,7 @@ def get_dataset():
     # Check dataset sizes
     print('Train Dataset: {}'.format(len(train_set)))
     print('Test Dataset: {}'.format(len(test_set)))
-    return test_set, train_set, train_loader, test_loader
+    return train_set, test_set, train_loader, test_loader
 
 
 
@@ -132,7 +132,7 @@ def train_clients(clients):
               outputs = clients[i].net(images)
               # Compute loss based on output and ground truth
               loss = clients[i].criterion(outputs, labels)
-
+              
               # Compute gradients for each layer and update weights
               loss.backward()  # backward pass: computes gradients
               clients[i].optimizer.step() # update weights based on accumulated gradients
@@ -172,3 +172,13 @@ def select_clients(clients):
   for i in range(ARGS.NUM_SELECTED_CLIENTS):
     round_clients_list.append(clients[i])
   return round_clients_list
+
+
+#GET DATASET LABELS DISTRIBUTION
+def get_dataset_distribution(dataset):
+    dataset_ = torch.utils.data.Subset(dataset,[j for j in range(len(dataset))])
+    d=[0 for j in range(ARGS.NUM_CLASSES)]
+    for label in range(len(dataset_)):
+        index=dataset[label][1]
+        d[index]=d[index]+1
+    return [d[j]/len(dataset) for j in range(ARGS.NUM_CLASSES)]

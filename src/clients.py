@@ -3,6 +3,7 @@ from models import get_net
 import torch.optim
 import torch.nn as nn
 from options import ARGS
+from utils import get_dataset_distribution
 
 #Client datastructure
 class Client():
@@ -20,12 +21,13 @@ class Client():
         
 
 #Istance list of clients
-def get_clients_list(train_loader_list, test_set):
+def get_clients_list(train_loader_list, train_set, test_set):
     clients_list=[]
+    
+    if(ARGS.ALGORITHM=='FedIR'):
+        p=get_dataset_distribution(train_set)
+        
     for i in range(ARGS.NUM_CLIENTS):
-      net=get_net()
-      opt = torch.optim.SGD(net.parameters(), lr=ARGS.LR, momentum=ARGS.MOMENTUM)
-      crt=nn.CrossEntropyLoss()
       
       if(len(train_loader_list[str(i)].dataset)%100==0):    # an epoch for every 100 images
         local_epoch=int(len(train_loader_list[str(i)].dataset)/100)
@@ -38,6 +40,23 @@ def get_clients_list(train_loader_list, test_set):
           classes.append(data[1])
       num_samples=int(len(train_loader_list[str(i)].dataset)*0.2)
       test_loader=generated_test_distribution(classes, test_set,num_samples) #specific testset for each clients
+        
+      net=get_net()
+      opt = torch.optim.SGD(net.parameters(), lr=ARGS.LR, momentum=ARGS.MOMENTUM)
+      w=None
+      
+      if(ARGS.ALGORITHM=='FedIR'):
+          q=get_dataset_distribution(train_loader_list[str(i)].dataset)
+          w=[0 for label in range(ARGS.NUM_CLASSES)]
+          for label in range(ARGS.NUM_CLASSES):
+              if(q[label]==0):  #se il client non ha quella classe???
+                  w[label]=0
+              else:
+                  w[label]=p[label]/q[label]
+          w=torch.tensor(w)
+
+      crt=nn.CrossEntropyLoss(weight=w)
+      
       
       client=Client(i,net,train_loader_list[str(i)],opt,crt,local_epoch,test_loader)
       clients_list.append(client)

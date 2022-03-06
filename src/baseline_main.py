@@ -1,5 +1,5 @@
 from sampling import dirichlet_distribution, cifar_iid, cifar_noniid
-from utils import get_dataset,send_server_model_to_clients, select_clients, train_clients, send_client_updates_to_server_and_aggregate, print_weights, weighted_accuracy
+from utils import get_dataset,send_server_model_to_clients, select_clients, train_clients, send_client_updates_to_server_and_aggregate, print_weights, weighted_accuracy,get_dataset_distribution
 from options import ARGS
 from clients import get_clients_list
 from models import get_net, evaluate
@@ -12,20 +12,19 @@ if __name__ == '__main__':
     if(ARGS.COLAB==0): #test locally
         ARGS.MODEL='LeNet5'
         ARGS.DEVICE='cpu'
-        ARGS.ALGORITHM='FedAvgM'
+        ARGS.ALGORITHM='FedIR'
         ARGS.SERVER_MOMENTUM=0.5
         ARGS.DISTRIBUTION=1
-        ARGS.ALPHA=100
+        ARGS.ALPHA=0.50
         ARGS.CENTRALIZED_MODE=1
         ARGS.NUM_CLIENTS=25
-        ARGS.NUM_SELECTED_CLIENTS=3
+        ARGS.NUM_SELECTED_CLIENTS=1
         
         
     if(ARGS.CENTRALIZED_MODE==1):
         asd=0
     
-    test_set, train_set, train_loader, test_loader = get_dataset()
-    
+    train_set, test_set, train_loader, test_loader = get_dataset()
     
     if(ARGS.DISTRIBUTION==1):  # https://github.com/google-research/google-research/tree/master/federated_vision_datasets
       train_user_images=dirichlet_distribution()
@@ -43,24 +42,15 @@ if __name__ == '__main__':
       train_loader_list[user_id]=dataloader
       
       
-    clients_list=get_clients_list(train_loader_list,test_set)
+    clients_list=get_clients_list(train_loader_list, train_set, test_set)
     
     
     for i in range(random.randint(2,7)):
       random.shuffle(clients_list)
-    ind=0
-    l=[0,0,0,0,0,0,0,0,0,0]
-    for i in range(len(clients_list[ind].train_loader.dataset)):
-      index=clients_list[ind].train_loader.dataset[i][1]
-      l[index]=l[index]+1
-    print("Distribution of trainset for client "+str(ind),l)
+    print("Distribution of trainset for client 0 ",get_dataset_distribution(clients_list[0].train_loader.dataset))
+    print("Distribution of testset for client 0 ",get_dataset_distribution(clients_list[0].test_loader.dataset))
     
-    l=[0,0,0,0,0,0,0,0,0,0]
-    for i in range(len(clients_list[ind].test_loader.dataset)):
-      index=clients_list[ind].test_loader.dataset[i][1]
-      l[index]=l[index]+1
-    print("Distribution of testset for client  "+str(ind),l)
-
+    
     print("Model: "+str(ARGS.MODEL))
     print("Dataset distribution: "+str(ARGS.DISTRIBUTION)+"  "+str(ARGS.ALPHA)+" ("+str(ARGS.NUM_CLASS_RANGE[0])+','+str(ARGS.NUM_CLASS_RANGE[1])+')')
     print("Number of clients: "+str(ARGS.NUM_CLIENTS))
