@@ -117,10 +117,26 @@ def train_clients(clients):
     previousW=copy.deepcopy(clients[0].net.state_dict())  #save the weights     θ ← θt
     
     for i in range(len(clients)): 
+        
+        #SET MODEL
         clients[i].net = clients[i].net.to(ARGS.DEVICE) # this will bring the network to GPU if DEVICE is cuda
         cudnn.benchmark # Calling this optimizes runtime
-        for epoch in range(clients[i].local_epoch):    
-            for images, labels in clients[i].train_loader:
+        
+        #SET LOADER AND EPOCH
+        if(ARGS.FEDVC==True):
+            if(len(clients[i].train_loader.dataset)>=ARGS.NVC):
+                indexes=random.sample(range(len(clients[i].train_loader.dataset)), ARGS.NVC)
+            else:
+                indexes=[random.randint(0,len(clients[i].train_loader.dataset)-1) for idx in range(ARGS.NVC)]
+            loader = torch.utils.data.DataLoader(dataset=torch.utils.data.Subset(clients[i].train_loader.dataset,indexes), batch_size=ARGS.BATCH_SIZE)
+            epoch=clients[i].local_epoch
+        else:
+            loader=clients[i].train_loader
+            epochs=clients[i].local_epochs
+        
+        #START TRAIN
+        for epoch in range(epochs):    
+            for images, labels in loader:
               # Bring data over the device of choice
               images = images.to(ARGS.DEVICE)
               labels = labels.to(ARGS.DEVICE)
@@ -137,11 +153,12 @@ def train_clients(clients):
               loss.backward()  # backward pass: computes gradients
               clients[i].optimizer.step() # update weights based on accumulated gradients
 
-        #calculate update   Δθ ← θt - θ
+        #CALCULATE UPDATE   Δθ ← θt - θ
         updates=clients[i].net.state_dict()
         for key in updates.keys():
           updates[key] = previousW[key] - updates[key]
         clients[i].updates=copy.deepcopy(updates)
+        
     return clients
 
 
@@ -166,12 +183,23 @@ def weighted_accuracy(clients):
 
 #SELECT CLIENTS
 def select_clients(clients):
-  for i in range(random.randint(2,7)):
-    random.shuffle(clients)
-  round_clients_list=[]
-  for i in range(ARGS.NUM_SELECTED_CLIENTS):
-    round_clients_list.append(clients[i])
-  return round_clients_list
+    
+  if(ARGS.FEDVC==True): #select clients with probabilities
+      indexes_range=list(range(len(clients)))
+
+      W=[]
+      for i in indexes_range:
+          W.append(len(clients[i].train_loader.dataset))
+          
+      indexes=[]
+      for i in range(ARGS.NUM_SELECTED_CLIENTS):
+          idx=random.choices(indexes_range, weights=W)[0]
+          indexes.append(idx)
+          W[idx]=0
+  else:
+      indexes=random.sample(range(0,len(clients)), ARGS.NUM_SELECTED_CLIENTS)
+      
+  return [clients[i] for i in indexes]
 
 
 #GET DATASET LABELS DISTRIBUTION

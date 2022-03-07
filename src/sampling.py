@@ -104,5 +104,5 @@ def generated_test_distribution(classes, test_set, num_samples):    # generate t
       if(len(test_user_images)==int(num_samples/len(classes))*count):
         break
   dataset_ = torch.utils.data.Subset(test_set, test_user_images)
-  dataloader = torch.utils.data.DataLoader(dataset=dataset_, batch_size=ARGS.BATCH_SIZE, shuffle=False)
+  dataloader = torch.utils.data.DataLoader(dataset=dataset_, batch_size=ARGS.BATCH_SIZE)
   return dataloader

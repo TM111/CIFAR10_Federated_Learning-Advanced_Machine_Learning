@@ -12,20 +12,24 @@ if __name__ == '__main__':
     if(ARGS.COLAB==0): #test locally
         ARGS.MODEL='LeNet5'
         ARGS.DEVICE='cpu'
-        ARGS.ALGORITHM='FedIR'
-        ARGS.SERVER_MOMENTUM=0.5
-        ARGS.DISTRIBUTION=1
-        ARGS.ALPHA=0.50
-        ARGS.CENTRALIZED_MODE=1
-        ARGS.NUM_CLIENTS=25
-        ARGS.NUM_SELECTED_CLIENTS=1
+        ARGS.ALGORITHM='FedAVG'
+        ARGS.FEDIR=False
+        ARGS.FEDVC=True
+        ARGS.SERVER_MOMENTUM=1
+        ARGS.DISTRIBUTION=3
+        ARGS.ALPHA=0.5
+        ARGS.CENTRALIZED_MODE=True
+        ARGS.NUM_CLIENTS=70
+        ARGS.NUM_SELECTED_CLIENTS=4
         
         
-    if(ARGS.CENTRALIZED_MODE==1):
+    if(ARGS.CENTRALIZED_MODE==True):
         asd=0
-    
+        
     train_set, test_set, train_loader, test_loader = get_dataset()
     
+    
+            
     if(ARGS.DISTRIBUTION==1):  # https://github.com/google-research/google-research/tree/master/federated_vision_datasets
       train_user_images=dirichlet_distribution()
     
@@ -43,14 +47,12 @@ if __name__ == '__main__':
       
       
     clients_list=get_clients_list(train_loader_list, train_set, test_set)
-    
-    
+
     for i in range(random.randint(2,7)):
       random.shuffle(clients_list)
-    print("Distribution of trainset for client 0 ",get_dataset_distribution(clients_list[0].train_loader.dataset))
-    print("Distribution of testset for client 0 ",get_dataset_distribution(clients_list[0].test_loader.dataset))
-    
-    
+    ind=0
+    print("Distribution of trainset for client "+str(ind),get_dataset_distribution(clients_list[ind].train_loader.dataset))
+
     print("Model: "+str(ARGS.MODEL))
     print("Dataset distribution: "+str(ARGS.DISTRIBUTION)+"  "+str(ARGS.ALPHA)+" ("+str(ARGS.NUM_CLASS_RANGE[0])+','+str(ARGS.NUM_CLASS_RANGE[1])+')')
     print("Number of clients: "+str(ARGS.NUM_CLIENTS))

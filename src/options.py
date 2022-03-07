@@ -26,7 +26,14 @@ def args_parser():
     parser.add_argument('--WEIGHT_DECAY', type=float, default=4e-4,
                         help="number of rounds of training")
     
-    parser.add_argument('--CENTRALIZED_MODE', type=int, default=0,
+    parser.add_argument('--FEDIR', action='store_true', default=False,
+                        help="number of rounds of training")
+    parser.add_argument('--FEDVC', action='store_true', default=False,
+                        help="number of rounds of training")
+    parser.add_argument('--NVC', type=int, default=200,
+                        help="number of rounds of training")
+    
+    parser.add_argument('--CENTRALIZED_MODE', action='store_true', default=False,
                         help="number of rounds of training")
     parser.add_argument('--DISTRIBUTION', type=int, default=1,
                         help="number of rounds of training")
