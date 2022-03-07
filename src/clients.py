@@ -23,7 +23,7 @@ class Client():
 def get_clients_list(train_loader_list, train_set, test_set):
     clients_list=[]
     
-    if(ARGS.ALGORITHM=='FedIR'):
+    if(ARGS.FEDIR==True):
         p=get_dataset_distribution(train_set)
         
     for i in range(ARGS.NUM_CLIENTS):
@@ -44,7 +44,7 @@ def get_clients_list(train_loader_list, train_set, test_set):
       opt = torch.optim.SGD(net.parameters(), lr=ARGS.LR, momentum=ARGS.MOMENTUM)
       w=None
       
-      if(ARGS.ALGORITHM=='FedIR'):
+      if(ARGS.FEDIR==True):
           q=get_dataset_distribution(train_loader_list[str(i)].dataset)
           w=[0 for label in range(ARGS.NUM_CLASSES)]
           for label in range(ARGS.NUM_CLASSES):

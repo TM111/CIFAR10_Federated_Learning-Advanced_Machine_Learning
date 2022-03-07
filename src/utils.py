@@ -32,18 +32,27 @@ def get_dataset():
 #https://github.com/AshwinRJ/Federated-Learning-PyTorch/blob/master/src/utils.py
 #Calculate AVG for each clients updates
 def average_weights(updates,clients):           # AggregateClient()
-    total_samples=0
-    for c in clients:
-      total_samples=total_samples+len(c.train_loader.dataset)
 
     updates_avg = copy.deepcopy(updates[0])
     for key in updates_avg.keys():
         updates_avg[key] = updates_avg[key]*0
-
-    for key in updates_avg.keys():
-        for i in range(0, len(updates)):
-            updates_avg[key] = updates_avg[key] + updates[i][key]*len(clients[i].train_loader.dataset)
-        updates_avg[key] = torch.div(updates_avg[key], total_samples)
+    
+    if(ARGS.FEDVC==True):  #standard average
+        for key in updates_avg.keys():
+            for i in range(0, len(updates)):
+                updates_avg[key] = updates_avg[key] + updates[i][key]
+            updates_avg[key] = torch.div(updates_avg[key], len(clients))
+            
+    else:  #weighted average
+        total_samples=0
+        for c in clients:
+          total_samples=total_samples+len(c.train_loader.dataset)
+    
+        for key in updates_avg.keys():
+            for i in range(0, len(updates)):
+                updates_avg[key] = updates_avg[key] + updates[i][key]*len(clients[i].train_loader.dataset)
+            updates_avg[key] = torch.div(updates_avg[key], total_samples)
+            
     return updates_avg
 
 
@@ -129,7 +138,7 @@ def train_clients(clients):
             else:
                 indexes=[random.randint(0,len(clients[i].train_loader.dataset)-1) for idx in range(ARGS.NVC)]
             loader = torch.utils.data.DataLoader(dataset=torch.utils.data.Subset(clients[i].train_loader.dataset,indexes), batch_size=ARGS.BATCH_SIZE)
-            epoch=clients[i].local_epoch
+            epochs=clients[i].local_epochs
         else:
             loader=clients[i].train_loader
             epochs=clients[i].local_epochs
