@@ -33,6 +33,9 @@ def args_parser():
     parser.add_argument('--NVC', type=int, default=200,
                         help="number of rounds of training")
     
+    parser.add_argument('--BATCH_NORM', action='store_true', default=False,
+                        help="number of rounds of training")
+    
     parser.add_argument('--CENTRALIZED_MODE', action='store_true', default=False,
                         help="number of rounds of training")
     parser.add_argument('--DISTRIBUTION', type=int, default=1,

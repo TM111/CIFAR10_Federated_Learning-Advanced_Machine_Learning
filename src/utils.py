@@ -91,8 +91,8 @@ def print_weights(clients,server_model):   # test to view if the algotihm is cor
       w.append(c.net.state_dict())
     w_avg=server_model.state_dict()
     
-    if(ARGS.MODEL=='LeNet5'):
-      node="conv1.weight"
+    if(ARGS.MODEL=='LeNet5' or ARGS.MODEL=='LeNet5_mod'):
+      node="conv1.0.weight"
     elif(ARGS.MODEL=='mobilenetV2'):
       node="features.2.conv.1.1.weight"
 

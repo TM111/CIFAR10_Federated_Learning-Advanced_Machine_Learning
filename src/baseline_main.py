@@ -10,18 +10,18 @@ import random
     
 if __name__ == '__main__':
     if(ARGS.COLAB==0): #test locally
-        ARGS.MODEL='LeNet5'
+        ARGS.MODEL='LeNet5_mod'
         ARGS.DEVICE='cpu'
         ARGS.ALGORITHM='FedAVG'
         ARGS.FEDIR=False
-        ARGS.FEDVC=True
+        ARGS.FEDVC=False
+        ARGS.BATCH_NORM=True
         ARGS.SERVER_MOMENTUM=1
-        ARGS.DISTRIBUTION=3
-        ARGS.ALPHA=0.5
+        ARGS.DISTRIBUTION=1
+        ARGS.ALPHA=100
         ARGS.CENTRALIZED_MODE=True
-        ARGS.NUM_CLIENTS=70
-        ARGS.NUM_SELECTED_CLIENTS=4
-        
+        ARGS.NUM_CLIENTS=1
+        ARGS.NUM_SELECTED_CLIENTS=1
         
     if(ARGS.CENTRALIZED_MODE==True):
         asd=0
