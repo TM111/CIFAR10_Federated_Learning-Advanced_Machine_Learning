@@ -14,17 +14,21 @@ if __name__ == '__main__':
         ARGS.DEVICE='cpu'
         ARGS.ALGORITHM='FedAVG'
         ARGS.FEDIR=False
-        ARGS.FEDVC=False
+        ARGS.FEDVC=True
         ARGS.BATCH_NORM=True
         ARGS.SERVER_MOMENTUM=1
         ARGS.DISTRIBUTION=1
         ARGS.ALPHA=100
-        ARGS.CENTRALIZED_MODE=True
-        ARGS.NUM_CLIENTS=1
-        ARGS.NUM_SELECTED_CLIENTS=1
+        #ARGS.CENTRALIZED_MODE=True
+        ARGS.NUM_CLIENTS=50
+        ARGS.NUM_SELECTED_CLIENTS=3
         
     if(ARGS.CENTRALIZED_MODE==True):
-        asd=0
+        ARGS.DISTRIBUTION=2
+        ARGS.NUM_CLIENTS=1
+        ARGS.NUM_SELECTED_CLIENTS=1
+        ARGS.FEDIR=False
+        ARGS.FEDVC=False
         
     train_set, test_set, train_loader, test_loader = get_dataset()
     
@@ -69,6 +73,8 @@ if __name__ == '__main__':
     #SERVER MODEL -> CLIENTS
     clients_list=send_server_model_to_clients(server_model, clients_list)
     
+    print(len(clients_list[0].train_loader.dataset))
+    print(len(clients_list[0].test_loader.dataset))
     for i in range(ARGS.ROUNDS):
       start_time = time.time()
     
@@ -92,14 +98,14 @@ if __name__ == '__main__':
 
     
       #TEST
-      test_loss, main_model_accuracy = evaluate(server_model, server_criterion, test_loader)
-      main_model_accuracy=round(main_model_accuracy,3)
+      test_loss, server_accuracy = evaluate(server_model, test_loader)
+      server_accuracy=round(server_accuracy,3)
       w_accuracy=round(weighted_accuracy(clients_list),3)
       seconds=str(round(float(time.time() - start_time),2))
-      print("After round "+str(i+1)+"  main model accuracy: "+str(main_model_accuracy)+"    weighted accuracy: "+str(w_accuracy)+"   time: "+seconds+" sec.")
+      print("After round "+str(i+1)+"  server accuracy: "+str(server_accuracy)+"    weighted accuracy: "+str(w_accuracy)+"   time: "+seconds+" sec.")
     
     print("-----------------------------------------")
-    print("Final Accuracy of Main Model Federated Learning: "+str(main_model_accuracy))
+    print("Final Accuracy of Main Model Federated Learning: "+str(server_accuracy))
     print("Final Weighted Accuracy of Federated Learning: "+str(w_accuracy))
     print("//////////////////////////////////////////////////////////////////")
     print("")
