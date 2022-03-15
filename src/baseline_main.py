@@ -31,8 +31,6 @@ if __name__ == '__main__':
         ARGS.FEDVC=False
         
     train_set, test_set, train_loader, test_loader = get_dataset()
-    
-    
             
     if(ARGS.DISTRIBUTION==1):  # https://github.com/google-research/google-research/tree/master/federated_vision_datasets
       train_user_images=dirichlet_distribution()
@@ -66,15 +64,13 @@ if __name__ == '__main__':
     
     #INSTANCE SERVER MODEL
     server_model=get_net()
-    server_optimizer = torch.optim.SGD(server_model.parameters(), lr=ARGS.SERVER_LR, momentum=ARGS.MOMENTUM)
+    server_optimizer = torch.optim.SGD(server_model.parameters(), lr=ARGS.LR, momentum=ARGS.MOMENTUM)
     server_criterion = nn.CrossEntropyLoss()
     server_model = server_model.to(ARGS.DEVICE)
     
     #SERVER MODEL -> CLIENTS
     clients_list=send_server_model_to_clients(server_model, clients_list)
     
-    print(len(clients_list[0].train_loader.dataset))
-    print(len(clients_list[0].test_loader.dataset))
     for i in range(ARGS.ROUNDS):
       start_time = time.time()
     
@@ -88,7 +84,7 @@ if __name__ == '__main__':
       server_model= send_client_updates_to_server_and_aggregate(server_model,selected_clients_list)
     
       #DEBUG
-      debug=1
+      debug=0
       if(debug):
         print("")
         print_weights(selected_clients_list,server_model)

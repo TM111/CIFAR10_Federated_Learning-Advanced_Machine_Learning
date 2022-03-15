@@ -4,6 +4,15 @@ import torch.nn.functional as func
 import torch.hub
 from options import ARGS
 
+'''
+lenet5
+resnet18
+
+pretrained ad freeze (transferlearning):
+mobilenet
+googlenet
+'''
+
 #DEFINE NETWORKS
 class LeNet5(nn.Module):
     def __init__(self):
@@ -59,6 +68,10 @@ class LeNet5_mod(nn.Module):
 def mobilenetV2(pretrain=True):
   model = torch.hub.load('pytorch/vision:v0.10.0', 'mobilenet_v2', pretrained=pretrain)
   return model
+
+
+
+
 
 def get_net():
   if(ARGS.MODEL=="LeNet5"):
