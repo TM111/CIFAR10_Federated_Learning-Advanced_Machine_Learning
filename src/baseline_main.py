@@ -14,10 +14,10 @@ if __name__ == '__main__':
         ARGS.DEVICE='cpu'
         ARGS.ALGORITHM='FedAVG'
         ARGS.FEDIR=False
-        ARGS.FEDVC=False
+        ARGS.FEDVC=True
         ARGS.BATCH_NORM=True
         ARGS.SERVER_MOMENTUM=1
-        ARGS.DISTRIBUTION=3
+        ARGS.DISTRIBUTION=1
         ARGS.ALPHA=100
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=50
@@ -68,6 +68,8 @@ if __name__ == '__main__':
     server_criterion = nn.CrossEntropyLoss()
     server_model = server_model.to(ARGS.DEVICE)
     
+    #SERVER MODEL -> CLIENTS
+    clients_list=send_server_model_to_clients(server_model, clients_list)
     
     for i in range(ARGS.ROUNDS):
       start_time = time.time()
@@ -75,9 +77,6 @@ if __name__ == '__main__':
       #SELECT CLEINTS
       selected_clients_list=select_clients(clients_list)
     
-      #SERVER MODEL -> SELECTED CLIENTS
-      selected_clients_list=send_server_model_to_clients(server_model, selected_clients_list)
-      
       #TRAIN CLIENTS
       selected_clients_list=train_clients(selected_clients_list)
     
@@ -85,10 +84,13 @@ if __name__ == '__main__':
       server_model= send_client_updates_to_server_and_aggregate(server_model,selected_clients_list)
     
       #DEBUG
-      debug=1
+      debug=0
       if(debug):
         print("")
         print_weights(selected_clients_list,server_model)
+    
+      #SERVER MODEL -> CLIENTS
+      clients_list=send_server_model_to_clients(server_model, clients_list)
 
     
       #TEST
