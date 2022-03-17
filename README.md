@@ -23,4 +23,3 @@ bank transactions).
 3. Understand the importance of clients’ local data distribution in the federated scenario.
 4. Understand the contribution of the normalization layers.
 5. Make a contribution for solving existing issues.
-
