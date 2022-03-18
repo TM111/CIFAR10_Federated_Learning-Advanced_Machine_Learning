@@ -91,10 +91,14 @@ def print_weights(clients,server_model):   # test to view if the algotihm is cor
       w.append(c.net.state_dict())
     w_avg=server_model.state_dict()
     
-    if(ARGS.MODEL=='LeNet5' or ARGS.MODEL=='LeNet5_mod'):
-      node="conv1.0.weight"
-    elif(ARGS.MODEL=='mobilenetV2'):
-      node="features.2.conv.1.1.weight"
+    max_u=-1
+    for key in clients[0].updates.keys():
+        if('bias' not in key and 'weight' not in key):
+            continue
+        u=abs(round(torch.sum(clients[0].updates[key]).tolist(),3))
+        if u>max_u:
+            max_u=u
+            node=key
 
     for i in range(len(clients)):
       s=str(i+1)+')'+'S:'+str(len(clients[i].train_loader.dataset))
@@ -124,9 +128,7 @@ def send_server_model_to_clients(main_model, clients):
 #TRAIN ALL CLIENTS
 def train_clients(clients):
     previousW=copy.deepcopy(clients[0].net.state_dict())  #save the weights     θ ← θt
-    
     for i in range(len(clients)): 
-        
         #SET MODEL
         clients[i].net = clients[i].net.to(ARGS.DEVICE) # this will bring the network to GPU if DEVICE is cuda
         cudnn.benchmark # Calling this optimizes runtime

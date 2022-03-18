@@ -1,5 +1,5 @@
 from sampling import generated_test_distribution
-from models import get_net
+from models import get_net_and_optimizer
 import torch.optim
 import torch.nn as nn
 from options import ARGS
@@ -40,8 +40,7 @@ def get_clients_list(train_loader_list, train_set, test_set):
       num_samples=int(len(train_loader_list[str(i)].dataset)*0.2)
       test_loader=generated_test_distribution(classes, test_set,num_samples) #specific testset for each clients
         
-      net=get_net()
-      opt = torch.optim.SGD(net.parameters(), lr=ARGS.LR, momentum=ARGS.MOMENTUM)
+      net, opt = get_net_and_optimizer()
       w=None
       
       if(ARGS.FEDIR==True):

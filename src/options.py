@@ -26,6 +26,11 @@ def args_parser():
     parser.add_argument('--WEIGHT_DECAY', type=float, default=4e-4,
                         help="number of rounds of training")
     
+    parser.add_argument('--PRETRAIN', action='store_true', default=False,
+                        help="number of rounds of training")
+    parser.add_argument('--FREEZE', action='store_true', default=False,
+                        help="number of rounds of training")
+    
     parser.add_argument('--FEDIR', action='store_true', default=False,
                         help="number of rounds of training")
     parser.add_argument('--FEDVC', action='store_true', default=False,
