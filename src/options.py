@@ -26,6 +26,8 @@ def args_parser():
     parser.add_argument('--WEIGHT_DECAY', type=float, default=4e-4,
                         help="number of rounds of training")
     
+    parser.add_argument('--OPTIMIZER', type=str, default='sgd',
+                        help="number of rounds of training")
     parser.add_argument('--PRETRAIN', action='store_true', default=False,
                         help="number of rounds of training")
     parser.add_argument('--FREEZE', action='store_true', default=False,

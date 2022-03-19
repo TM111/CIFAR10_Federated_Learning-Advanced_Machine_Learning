@@ -188,10 +188,6 @@ def weighted_accuracy(clients):
   return sum/num_samples
 
 
-
-
-
-
 #SELECT CLIENTS
 def select_clients(clients):
     

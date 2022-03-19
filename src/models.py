@@ -97,7 +97,6 @@ class CNNCifar(nn.Module): #https://www.tensorflow.org/tutorials/images/cnn
         return x
 
 
-
 def get_net_and_optimizer():
       if(ARGS.MODEL=="LeNet5"):
           model = LeNet5()
@@ -119,7 +118,8 @@ def get_net_and_optimizer():
       classifier_name=list(dict(model.named_modules()).keys())[len(list(dict(model.named_modules()).keys()))-1].split(".")[0]
       classifier=getattr(model, classifier_name)
       if isinstance(classifier, nn.Sequential):
-          classifier[len(classifier)-1] = nn.Linear(classifier[len(classifier)-1].in_features, ARGS.NUM_CLASSES)
+          if isinstance(classifier[len(classifier)-1], nn.Linear):
+              classifier[len(classifier)-1] = nn.Linear(classifier[len(classifier)-1].in_features, ARGS.NUM_CLASSES)
       elif isinstance(classifier, nn.Linear):
           classifier = nn.Linear(classifier.in_features, ARGS.NUM_CLASSES)
       setattr(model, classifier_name, classifier)
@@ -135,7 +135,10 @@ def get_net_and_optimizer():
               param.requires_grad = True
           parameters_to_optimize=classifier.parameters()
           
-      optimizer = torch.optim.SGD(parameters_to_optimize, lr=ARGS.LR, momentum=ARGS.MOMENTUM)
+      if(ARGS.OPTIMIZER=="sgd"):
+          optimizer = torch.optim.SGD(parameters_to_optimize, lr=ARGS.LR, momentum=ARGS.MOMENTUM)
+      elif(ARGS.OPTIMIZER=="adam"):
+          optimizer = torch.optim.Adam(parameters_to_optimize, lr=ARGS.LR)
       return model, optimizer
        
     
