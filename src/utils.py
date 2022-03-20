@@ -125,11 +125,12 @@ def send_server_model_to_clients(main_model, clients):
 
 #TRAIN ALL CLIENTS
 def train_clients(clients):
-    previousW=copy.deepcopy(clients[0].net.state_dict())  #save the weights     θ ← θt
     for i in range(len(clients)): 
         #SET MODEL
         clients[i].net = clients[i].net.to(ARGS.DEVICE) # this will bring the network to GPU if DEVICE is cuda
         cudnn.benchmark # Calling this optimizes runtime
+        if i == 0:
+            previousW=copy.deepcopy(clients[0].net.state_dict())  #save the weights     θ ← θt
         
         #SET LOADER AND EPOCH
         if(ARGS.FEDVC==True):
