@@ -63,7 +63,8 @@ def args_parser():
     # model arguments
     parser.add_argument('--MODEL', type=str, default='mlp', help='model name')
     
-    parser.add_argument('--COLAB', type=int, default=0, help='run on colab or locally')
+    parser.add_argument('--COLAB', action='store_true', default=False,
+                        help="number of rounds of training")
 
     args = parser.parse_args()
     return args
