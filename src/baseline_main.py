@@ -10,9 +10,9 @@ import random
     
 
 if __name__ == '__main__':
-    if(ARGS.COLAB==0): #test locally
+    if(ARGS.COLAB==False): #test locally
         ARGS.MODEL='CNNCifar'
-        ARGS.DEVICE='cpu'
+        ARGS.DEVICE='cuda'
         ARGS.ALGORITHM='FedAvg'  #FedAvg FedAvgM
         ARGS.FEDIR=False
         ARGS.FEDVC=False

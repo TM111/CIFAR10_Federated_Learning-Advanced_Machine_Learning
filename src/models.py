@@ -96,6 +96,42 @@ class CNNCifar(nn.Module): #https://www.tensorflow.org/tutorials/images/cnn
         x = self.classifier(x)
         return x
 
+class CNNNet(nn.Module):  #◘https://github.com/simoninithomas/cifar-10-classifier-pytorch/blob/master/PyTorch%20Cifar-10%20Classifier.ipynb
+    def __init__(self):
+        super(CNNNet, self).__init__()
+        
+        # Convolutional layers
+                            #Init_channels, channels, kernel_size, padding) 
+        self.conv1 = nn.Conv2d(3, 16, 3, padding=1)
+        self.conv2 = nn.Conv2d(16, 32, 3, padding=1)
+        self.conv3 = nn.Conv2d(32, 64, 3, padding=1)
+        
+        # Pooling layers
+        self.pool = nn.MaxPool2d(2,2)
+        
+        # FC layers
+        # Linear layer (64x4x4 -> 500)
+        self.fc1 = nn.Linear(64 * 4 * 4, 500)
+        
+        # Linear Layer (500 -> 10)
+        self.fc2 = nn.Linear(500, 10)
+        
+        # Dropout layer
+        self.dropout = nn.Dropout(0.25)
+        
+    def forward(self, x):
+        x = self.pool(func.elu(self.conv1(x)))
+        x = self.pool(func.elu(self.conv2(x)))
+        x = self.pool(func.elu(self.conv3(x)))
+        
+        # Flatten the image
+        x = x.view(-1, 64*4*4)
+        x = self.dropout(x)
+        x = func.elu(self.fc1(x))
+        x = self.dropout(x)
+        x = self.fc2(x)
+        return x
+    
 def get_net_and_optimizer():
       if(ARGS.MODEL=="LeNet5"):
           model = LeNet5()
@@ -111,6 +147,8 @@ def get_net_and_optimizer():
           model = m.googlenet(pretrained=ARGS.PRETRAIN, aux_logits=False)
       elif(ARGS.MODEL=="CNNCifar"):
           model = CNNCifar()
+      elif(ARGS.MODEL=="CNNNet"):
+          model = CNNNet()
       
         
       #SET LAST LAYER OUTPUT=NUM_CLASSES
