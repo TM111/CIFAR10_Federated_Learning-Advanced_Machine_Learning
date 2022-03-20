@@ -96,7 +96,6 @@ class CNNCifar(nn.Module): #https://www.tensorflow.org/tutorials/images/cnn
         x = self.classifier(x)
         return x
 
-
 def get_net_and_optimizer():
       if(ARGS.MODEL=="LeNet5"):
           model = LeNet5()

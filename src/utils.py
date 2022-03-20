@@ -27,8 +27,6 @@ def get_dataset():
 
 
 
-
-
 #https://github.com/AshwinRJ/Federated-Learning-PyTorch/blob/master/src/utils.py
 #Calculate AVG for each clients updates
 def average_weights(updates,clients):           # AggregateClient()

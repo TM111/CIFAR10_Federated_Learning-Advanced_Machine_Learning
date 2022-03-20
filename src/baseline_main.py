@@ -8,17 +8,19 @@ import torch.nn as nn
 import time
 import random
     
+
 if __name__ == '__main__':
     if(ARGS.COLAB==0): #test locally
-        ARGS.MODEL='LeNet5'
+        ARGS.MODEL='CNNCifar'
         ARGS.DEVICE='cpu'
-        ARGS.ALGORITHM='FedAVG'
+        ARGS.ALGORITHM='FedAVG'  #FedAVG FedAVGM
         ARGS.FEDIR=False
         ARGS.FEDVC=False
         ARGS.BATCH_NORM=True
         ARGS.OPTIMIZER='adam'
         ARGS.SERVER_MOMENTUM=1
-        ARGS.FREEZE=True
+        ARGS.PRETRAIN=False
+        ARGS.FREEZE=False
         ARGS.DISTRIBUTION=1
         ARGS.ALPHA=100
         #ARGS.CENTRALIZED_MODE=True
@@ -56,6 +58,7 @@ if __name__ == '__main__':
       random.shuffle(clients)
     ind=0
     print("Distribution of trainset for client "+str(ind),get_dataset_distribution(clients[ind].train_loader.dataset))
+
 
     print("Model: "+str(ARGS.MODEL))
     print("Dataset distribution: "+str(ARGS.DISTRIBUTION)+"  "+str(ARGS.ALPHA)+" ("+str(ARGS.NUM_CLASS_RANGE[0])+','+str(ARGS.NUM_CLASS_RANGE[1])+')')
@@ -101,6 +104,7 @@ if __name__ == '__main__':
       w_accuracy=round(weighted_accuracy(clients),3)
       seconds=str(round(float(time.time() - start_time),2))
       print("After round "+str(i+1)+"  server accuracy: "+str(server_accuracy)+"    weighted accuracy: "+str(w_accuracy)+"   time: "+seconds+" sec.")
+    
     
     print("-----------------------------------------")
     print("Final Accuracy of Main Model Federated Learning: "+str(server_accuracy))
