@@ -13,7 +13,7 @@ if __name__ == '__main__':
     if(ARGS.COLAB==0): #test locally
         ARGS.MODEL='CNNCifar'
         ARGS.DEVICE='cpu'
-        ARGS.ALGORITHM='FedAVG'  #FedAVG FedAVGM
+        ARGS.ALGORITHM='FedAvg'  #FedAvg FedAvgM
         ARGS.FEDIR=False
         ARGS.FEDVC=False
         ARGS.BATCH_NORM=True
