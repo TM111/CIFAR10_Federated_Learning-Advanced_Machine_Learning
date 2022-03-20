@@ -14,25 +14,25 @@ if __name__ == '__main__':
         ARGS.MODEL='CNNCifar'
         ARGS.DEVICE='cuda'
         ARGS.ALGORITHM='FedAvg'  #FedAvg FedAvgM
-        ARGS.FEDIR=0
-        ARGS.FEDVC=0
+        ARGS.FEDIR=False
+        ARGS.FEDVC=False
         ARGS.BATCH_NORM=1
         ARGS.OPTIMIZER='adam'
         ARGS.SERVER_MOMENTUM=1
-        ARGS.PRETRAIN=0
-        ARGS.FREEZE=0
+        ARGS.PRETRAIN=False
+        ARGS.FREEZE=False
         ARGS.DISTRIBUTION=1
         ARGS.ALPHA=100
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
         ARGS.NUM_SELECTED_CLIENTS=3
         
-    if(ARGS.CENTRALIZED_MODE==1):
+    if(ARGS.CENTRALIZED_MODE):
         ARGS.DISTRIBUTION=2
         ARGS.NUM_CLIENTS=1
         ARGS.NUM_SELECTED_CLIENTS=1
-        ARGS.FEDIR=0
-        ARGS.FEDVC=0
+        ARGS.FEDIR=False
+        ARGS.FEDVC=False
         
     train_set, test_set, train_loader, test_loader = get_dataset()
             

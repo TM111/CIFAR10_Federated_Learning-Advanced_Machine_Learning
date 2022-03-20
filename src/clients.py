@@ -23,7 +23,7 @@ class Client():
 def get_clients_list(train_loader_list, train_set, test_set):
     clients_list=[]
     
-    if(ARGS.FEDIR==True):
+    if(ARGS.FEDIR):
         p=get_dataset_distribution(train_set)
         
     for i in range(ARGS.NUM_CLIENTS):
@@ -43,7 +43,7 @@ def get_clients_list(train_loader_list, train_set, test_set):
       net, opt = get_net_and_optimizer()
       w=None
       
-      if(ARGS.FEDIR==True):
+      if(ARGS.FEDIR):
           q=get_dataset_distribution(train_loader_list[str(i)].dataset)
           w=[0 for label in range(ARGS.NUM_CLASSES)]
           for label in range(ARGS.NUM_CLASSES):

@@ -35,7 +35,7 @@ def average_weights(updates,clients):           # AggregateClient()
     for key in updates_avg.keys():
         updates_avg[key] = updates_avg[key]*0
     
-    if(ARGS.FEDVC==True):  #standard average
+    if(ARGS.FEDVC):  #standard average
         for key in updates_avg.keys():
             for i in range(0, len(updates)):
                 updates_avg[key] = updates_avg[key] + updates[i][key]
@@ -133,7 +133,7 @@ def train_clients(clients):
             previousW=copy.deepcopy(clients[0].net.state_dict())  #save the weights     θ ← θt
         
         #SET LOADER AND EPOCH
-        if(ARGS.FEDVC==True):
+        if(ARGS.FEDVC):
             if(len(clients[i].train_loader.dataset)>=ARGS.NVC):
                 indexes=random.sample(range(len(clients[i].train_loader.dataset)), ARGS.NVC)
             else:
