@@ -28,22 +28,22 @@ def args_parser():
     
     parser.add_argument('--OPTIMIZER', type=str, default='sgd',
                         help="number of rounds of training")
-    parser.add_argument('--PRETRAIN', action='store_true', default=False,
+    parser.add_argument('--PRETRAIN', type=int, default=0,
                         help="number of rounds of training")
-    parser.add_argument('--FREEZE', action='store_true', default=False,
+    parser.add_argument('--FREEZE', type=int, default=0,
                         help="number of rounds of training")
     
-    parser.add_argument('--FEDIR', action='store_true', default=False,
+    parser.add_argument('--FEDIR', type=int, default=0,
                         help="number of rounds of training")
-    parser.add_argument('--FEDVC', action='store_true', default=False,
+    parser.add_argument('--FEDVC', type=int, default=0,
                         help="number of rounds of training")
     parser.add_argument('--NVC', type=int, default=200,
                         help="number of rounds of training")
     
-    parser.add_argument('--BATCH_NORM', action='store_true', default=False,
+    parser.add_argument('--BATCH_NORM', type=int, default=0,
                         help="number of rounds of training")
     
-    parser.add_argument('--CENTRALIZED_MODE', action='store_true', default=False,
+    parser.add_argument('--CENTRALIZED_MODE', type=int, default=0,
                         help="number of rounds of training")
     parser.add_argument('--DISTRIBUTION', type=int, default=1,
                         help="number of rounds of training")
@@ -63,7 +63,7 @@ def args_parser():
     # model arguments
     parser.add_argument('--MODEL', type=str, default='mlp', help='model name')
     
-    parser.add_argument('--COLAB', action='store_true', default=False,
+    parser.add_argument('--COLAB', type=int, default=0,
                         help="number of rounds of training")
 
     args = parser.parse_args()

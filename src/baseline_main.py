@@ -10,29 +10,29 @@ import random
     
 
 if __name__ == '__main__':
-    if(ARGS.COLAB==False): #test locally
+    if(ARGS.COLAB==0): #test locally
         ARGS.MODEL='CNNCifar'
         ARGS.DEVICE='cuda'
         ARGS.ALGORITHM='FedAvg'  #FedAvg FedAvgM
-        ARGS.FEDIR=False
-        ARGS.FEDVC=False
-        ARGS.BATCH_NORM=True
+        ARGS.FEDIR=0
+        ARGS.FEDVC=0
+        ARGS.BATCH_NORM=1
         ARGS.OPTIMIZER='adam'
         ARGS.SERVER_MOMENTUM=1
-        ARGS.PRETRAIN=False
-        ARGS.FREEZE=False
+        ARGS.PRETRAIN=0
+        ARGS.FREEZE=0
         ARGS.DISTRIBUTION=1
         ARGS.ALPHA=100
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
         ARGS.NUM_SELECTED_CLIENTS=3
         
-    if(ARGS.CENTRALIZED_MODE==True):
+    if(ARGS.CENTRALIZED_MODE==1):
         ARGS.DISTRIBUTION=2
         ARGS.NUM_CLIENTS=1
         ARGS.NUM_SELECTED_CLIENTS=1
-        ARGS.FEDIR=False
-        ARGS.FEDVC=False
+        ARGS.FEDIR=0
+        ARGS.FEDVC=0
         
     train_set, test_set, train_loader, test_loader = get_dataset()
             
