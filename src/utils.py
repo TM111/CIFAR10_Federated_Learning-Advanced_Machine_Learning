@@ -16,13 +16,13 @@ def get_dataset():
     train_set = torchvision.datasets.CIFAR10(root='./CIFAR10', train=True, download=True, transform=train_transform)
     test_set = torchvision.datasets.CIFAR10(root='./CIFAR10', train=False, download=True, transform=test_transform)
 
-    train_loader = torch.utils.data.DataLoader(dataset=train_set, batch_size=ARGS.BATCH_SIZE, shuffle=False)
-    test_loader = torch.utils.data.DataLoader(dataset=test_set, batch_size=ARGS.BATCH_SIZE, shuffle=False)
+    train_loader = torch.utils.data.DataLoader(dataset=train_set, batch_size=ARGS.BATCH_SIZE, shuffle=True)
+    test_loader = torch.utils.data.DataLoader(dataset=test_set, batch_size=ARGS.BATCH_SIZE, shuffle=True)
     
     # Check dataset sizes
     print('Train Dataset: {}'.format(len(train_set)))
     print('Test Dataset: {}'.format(len(test_set)))
-    return train_set, test_set, train_loader, test_loader
+    return train_loader.dataset, test_loader.dataset, train_loader, test_loader
 
 
 
@@ -215,4 +215,4 @@ def get_dataset_distribution(dataset):
     for label in range(len(dataset_)):
         index=dataset[label][1]
         d[index]=d[index]+1
-    return [d[j]/len(dataset) for j in range(ARGS.NUM_CLASSES)]
+    return [round(d[j]/len(dataset),3) for j in range(ARGS.NUM_CLASSES)]

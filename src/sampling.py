@@ -41,25 +41,30 @@ def dirichlet_distribution():    # generate trainset split from csv
     print('Error: file does not exist.')
     return
   user_images={}
+  for client_id in range(ARGS.NUM_CLIENTS):
+      user_images[str(client_id)]=[]
+      
   with open(train_file) as f:
     reader = csv.reader(f)
     next(reader)  # skip header.
     for line in reader:
       user_id, image_id, class_id = cifar_parser(line, is_train=True)
-      if(user_id not in user_images.keys()):
-        user_images[user_id]=[]
       user_images[user_id].append(int(image_id))
   return user_images
 
 
 def cifar_iid(train_set): # all clients have all classes with the same data distribution
   user_images={}
+  for client_id in range(ARGS.NUM_CLIENTS):
+      user_images[str(client_id)]=[]
+      
   classes_dict={}
+  for label in range(ARGS.NUM_CLASSES):
+      classes_dict[label]=[]
   for i in range(len(train_set)):
     label=train_set[i][1]
-    if(label not in classes_dict.keys()):
-      classes_dict[label]=[]
     classes_dict[label].append(i)
+    
   classes_index=[]
   for label in classes_dict.keys():
     for i in range(random.randint(2,7)):
@@ -67,9 +72,9 @@ def cifar_iid(train_set): # all clients have all classes with the same data dist
     classes_index=classes_index+classes_dict[label]
 
   client_id=0
+  
+
   for i in classes_index:
-    if(str(client_id) not in user_images.keys()):
-      user_images[str(client_id)]=[]
     user_images[str(client_id)].append(i)
     client_id=client_id+1
     if(client_id==ARGS.NUM_CLIENTS):
@@ -90,6 +95,58 @@ def cifar_noniid(train_set): # all clients have a number of class beetwen 1 and 
     user_images[key]=new_index_list
   return user_images
 
+
+
+def cifar_multimodal_noniid(train_set): 
+    animals_labels=[2,3,4,5,6,7]
+    vehicles_labels=[0,1,8,9]
+    
+    num_clients_animal=max(int(ARGS.NUM_CLIENTS*ARGS.RATIO),1)
+    
+    user_images={}
+    user_classes={}
+    for client_id in range(ARGS.NUM_CLIENTS):
+        user_images[str(client_id)]=[]
+        if(client_id<num_clients_animal):
+            list_of_class=animals_labels
+        else:
+            list_of_class=vehicles_labels
+        for i in range(random.randint(2,7)):
+          random.shuffle(list_of_class)
+        user_classes[str(client_id)]=list_of_class[:ARGS.Z]
+        
+    classes_dict={}
+    for label in range(ARGS.NUM_CLASSES):
+        classes_dict[label]=[]
+    for i in range(len(train_set)):
+      label=train_set[i][1]
+      classes_dict[label].append(i)
+    
+    client_id=-1
+    for label in classes_dict.keys():
+        for index in classes_dict[label]:
+            for j in range(ARGS.NUM_CLIENTS):
+                client_id=(client_id+1)%ARGS.NUM_CLIENTS
+                if(label in user_classes[str(client_id)]):
+                    user_images[str(client_id)].append(index)
+                    break
+        
+    #bilancio il dataset
+    size=len(train_set)
+    for key in user_images.keys():
+        size=min(len(user_images[key]),size)
+        
+    for key in user_images.keys():
+        indexes=user_images[key]
+        for i in range(random.randint(2,7)):
+          random.shuffle(indexes)
+        indexes=indexes[:size]
+        user_images[key]=indexes
+    return user_images
+
+
+
+
 def get_train_distribution(train_set):
     if(ARGS.DISTRIBUTION==1):  # https://github.com/google-research/google-research/tree/master/federated_vision_datasets
       train_user_images=dirichlet_distribution()
@@ -99,6 +156,9 @@ def get_train_distribution(train_set):
     
     elif(ARGS.DISTRIBUTION==3):  # https://towardsdatascience.com/preserving-data-privacy-in-deep-learning-part-2-6c2e9494398b
       train_user_images=cifar_noniid(train_set)
+      
+    elif(ARGS.DISTRIBUTION==4):  # https://arxiv.org/pdf/2008.05687.pdf
+      train_user_images=cifar_multimodal_noniid(train_set)
      
     train_loader_list={}   #TRAIN LOADER DICT
     for user_id in train_user_images.keys():
@@ -106,6 +166,7 @@ def get_train_distribution(train_set):
       dataloader = torch.utils.data.DataLoader(dataset=dataset_, batch_size=ARGS.BATCH_SIZE, shuffle=False)
       train_loader_list[user_id]=dataloader
     return train_loader_list
+
 
 def get_cached_clients():
     if(ARGS.COLAB):
@@ -125,6 +186,9 @@ def get_cached_clients():
         files = [f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
         for f in files: os.remove(dir+f)
         return None
+    
+    
+    
     
 def generated_test_distribution(classes, test_set, num_samples):    # generate testset with specific class and size
   test_user_images=[]

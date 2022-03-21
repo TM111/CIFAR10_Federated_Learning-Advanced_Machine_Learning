@@ -47,10 +47,18 @@ def args_parser():
                         help="number of rounds of training")
     parser.add_argument('--DISTRIBUTION', type=int, default=1,
                         help="number of rounds of training")
+    
     parser.add_argument('--ALPHA', type=float, default=0.5,
                         help="number of rounds of training")
+    
+    parser.add_argument('--RATIO', type=float, default=0.8,
+                        help="number of rounds of training")
+    parser.add_argument('--Z', type=int, default=2,
+                        help="number of rounds of training")
+    
     parser.add_argument('--NUM_CLASS_RANGE', type=list, default=[1,7],
                         help="number of rounds of training")
+    
     parser.add_argument('--NUM_CLIENTS', type=int, default=100,
                         help="number of rounds of training")
     parser.add_argument('--NUM_SELECTED_CLIENTS', type=int, default=3,

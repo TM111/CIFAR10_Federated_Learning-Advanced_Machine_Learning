@@ -21,8 +21,8 @@ if __name__ == '__main__':
         ARGS.SERVER_MOMENTUM=1
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
-        ARGS.DISTRIBUTION=3
-        ARGS.ALPHA=100
+        ARGS.DISTRIBUTION=4
+        ARGS.ALPHA=0.1
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
         ARGS.NUM_SELECTED_CLIENTS=3
@@ -38,7 +38,6 @@ if __name__ == '__main__':
     train_set, test_set, train_loader, test_loader = get_dataset()  #download dataset
     
     clients=get_cached_clients() #get cached clients list
-    
     if(clients==None):
         train_loader_list=get_train_distribution(train_set) #split trainset to current distribution
         clients=get_clients_list(train_loader_list, train_set, test_set) #generate client list
@@ -47,7 +46,6 @@ if __name__ == '__main__':
       random.shuffle(clients)
     ind=0
     print("Distribution of trainset for client "+str(ind),get_dataset_distribution(clients[ind].train_loader.dataset))
-
 
     print("Model: "+str(ARGS.MODEL))
     print("Dataset distribution: "+str(ARGS.DISTRIBUTION)+"  "+str(ARGS.ALPHA)+" ("+str(ARGS.NUM_CLASS_RANGE[0])+','+str(ARGS.NUM_CLASS_RANGE[1])+')')
