@@ -4,6 +4,8 @@ import torch.optim
 import torch.nn as nn
 from options import ARGS
 from utils import get_dataset_distribution
+import os
+import pickle as pickle
 
 #Client datastructure
 class Client():
@@ -58,4 +60,13 @@ def get_clients_list(train_loader_list, train_set, test_set):
       
       client=Client(i,net,train_loader_list[str(i)],opt,crt,local_epochs,test_loader)
       clients_list.append(client)
+    
+    #cache clients list
+    if(ARGS.COLAB):
+        dir="/content/clients_list_cache/"
+    else:
+        dir=os.getcwd()+"/clients_list_cache/"
+    file=str(ARGS.DISTRIBUTION)+str(ARGS.ALPHA)+str(ARGS.NUM_CLASS_RANGE[0])+str(ARGS.NUM_CLASS_RANGE[1])+str(ARGS.NUM_CLIENTS)
+    with open(dir+file, 'wb') as config_dictionary_file:
+        pickle.dump(clients_list,config_dictionary_file)
     return clients_list

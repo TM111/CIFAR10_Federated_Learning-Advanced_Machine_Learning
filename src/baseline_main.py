@@ -1,4 +1,4 @@
-from sampling import dirichlet_distribution, cifar_iid, cifar_noniid
+from sampling import dirichlet_distribution, cifar_iid, cifar_noniid, get_train_distribution,get_cached_clients
 from utils import get_dataset,send_server_model_to_clients, select_clients, train_clients, send_client_updates_to_server_and_aggregate, print_weights, weighted_accuracy,get_dataset_distribution
 from options import ARGS
 from clients import get_clients_list
@@ -11,8 +11,8 @@ import random
 
 if __name__ == '__main__':
     if(ARGS.COLAB==0): #test locally
-        ARGS.MODEL='CNNCifar'
-        ARGS.DEVICE='cuda'
+        ARGS.MODEL='LeNet5'
+        ARGS.DEVICE='cpu'
         ARGS.ALGORITHM='FedAvg'  #FedAvg FedAvgM
         ARGS.FEDIR=False
         ARGS.FEDVC=False
@@ -21,7 +21,7 @@ if __name__ == '__main__':
         ARGS.SERVER_MOMENTUM=1
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
-        ARGS.DISTRIBUTION=1
+        ARGS.DISTRIBUTION=3
         ARGS.ALPHA=100
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
@@ -34,26 +34,15 @@ if __name__ == '__main__':
         ARGS.FEDIR=False
         ARGS.FEDVC=False
         
-    train_set, test_set, train_loader, test_loader = get_dataset()
-            
-    if(ARGS.DISTRIBUTION==1):  # https://github.com/google-research/google-research/tree/master/federated_vision_datasets
-      train_user_images=dirichlet_distribution()
     
-    elif(ARGS.DISTRIBUTION==2):
-      train_user_images=cifar_iid(train_set)
+    train_set, test_set, train_loader, test_loader = get_dataset()  #download dataset
     
-    elif(ARGS.DISTRIBUTION==3):  # https://towardsdatascience.com/preserving-data-privacy-in-deep-learning-part-2-6c2e9494398b
-      train_user_images=cifar_noniid(train_set)
-     
-    train_loader_list={}   #TRAIN LOADER DICT
-    for user_id in train_user_images.keys():
-      dataset_ = torch.utils.data.Subset(train_set, train_user_images[user_id])
-      dataloader = torch.utils.data.DataLoader(dataset=dataset_, batch_size=ARGS.BATCH_SIZE, shuffle=False)
-      train_loader_list[user_id]=dataloader
-      
-      
-    clients=get_clients_list(train_loader_list, train_set, test_set)
-
+    clients=get_cached_clients() #get cached clients list
+    
+    if(clients==None):
+        train_loader_list=get_train_distribution(train_set) #split trainset to current distribution
+        clients=get_clients_list(train_loader_list, train_set, test_set) #generate client list
+    
     for i in range(random.randint(2,7)):
       random.shuffle(clients)
     ind=0

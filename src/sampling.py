@@ -6,6 +6,7 @@ import urllib.request
 import zipfile
 import random
 from options import ARGS
+import pickle as pickle
 
 def cifar_parser(line, is_train=True):
   if is_train:
@@ -89,7 +90,37 @@ def cifar_noniid(train_set): # all clients have a number of class beetwen 1 and 
     user_images[key]=new_index_list
   return user_images
 
+def get_train_distribution(train_set):
+    if(ARGS.DISTRIBUTION==1):  # https://github.com/google-research/google-research/tree/master/federated_vision_datasets
+      train_user_images=dirichlet_distribution()
+    
+    elif(ARGS.DISTRIBUTION==2):
+      train_user_images=cifar_iid(train_set)
+    
+    elif(ARGS.DISTRIBUTION==3):  # https://towardsdatascience.com/preserving-data-privacy-in-deep-learning-part-2-6c2e9494398b
+      train_user_images=cifar_noniid(train_set)
+     
+    train_loader_list={}   #TRAIN LOADER DICT
+    for user_id in train_user_images.keys():
+      dataset_ = torch.utils.data.Subset(train_set, train_user_images[user_id])
+      dataloader = torch.utils.data.DataLoader(dataset=dataset_, batch_size=ARGS.BATCH_SIZE, shuffle=False)
+      train_loader_list[user_id]=dataloader
+    return train_loader_list
 
+def get_cached_clients():
+    if(ARGS.COLAB):
+        dir="/content/clients_list_cache/"
+    else:
+        dir=os.getcwd()+"/clients_list_cache/"
+    file=str(ARGS.DISTRIBUTION)+str(ARGS.ALPHA)+str(ARGS.NUM_CLASS_RANGE[0])+str(ARGS.NUM_CLASS_RANGE[1])+str(ARGS.NUM_CLIENTS)
+    if(os.path.exists(dir+file)):
+        with open(dir+file, 'rb') as config_dictionary_file:
+            return pickle.load(config_dictionary_file)
+    else:
+        files = [f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
+        for f in files: os.remove(dir+f)
+        return None
+    
 def generated_test_distribution(classes, test_set, num_samples):    # generate testset with specific class and size
   test_user_images=[]
   count=0

@@ -3,3 +3,4 @@ src/__pycache__
 src/CIFAR10
 src/cifar10_csv
 src/test.py
+src/clients_list_cache
