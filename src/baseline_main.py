@@ -7,7 +7,7 @@ import torch.optim
 import torch.nn as nn
 import time
 import random
-    
+
 
 if __name__ == '__main__':
     if(ARGS.COLAB==0): #test locally
@@ -23,9 +23,11 @@ if __name__ == '__main__':
         ARGS.FREEZE=False
         ARGS.DISTRIBUTION=4
         ARGS.ALPHA=0.1
+        ARGS.RATIO=0.8
+        ARGS.Z=4
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
-        ARGS.NUM_SELECTED_CLIENTS=3
+        ARGS.NUM_SELECTED_CLIENTS=10
         
     if(ARGS.CENTRALIZED_MODE):
         ARGS.DISTRIBUTION=2
@@ -33,7 +35,7 @@ if __name__ == '__main__':
         ARGS.NUM_SELECTED_CLIENTS=1
         ARGS.FEDIR=False
         ARGS.FEDVC=False
-        
+    
     
     train_set, test_set, train_loader, test_loader = get_dataset()  #download dataset
     
@@ -72,7 +74,7 @@ if __name__ == '__main__':
       selected_clients=train_clients(selected_clients)
     
       #CLIENTS UPDATES -> SERVER & AVERAGE
-      server_model= send_client_updates_to_server_and_aggregate(server_model,selected_clients)
+      server_model = send_client_updates_to_server_and_aggregate(server_model,selected_clients)
     
       #DEBUG: print size,sum_weights,sum_updates for each client
       debug=0

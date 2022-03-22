@@ -178,7 +178,7 @@ def get_net_and_optimizer():
           optimizer = torch.optim.Adam(parameters_to_optimize, lr=ARGS.LR)
       return model, optimizer
        
-    
+
 #DEFINE TEST FUNCTION
 def evaluate(net, dataloader):
       criterion = nn.CrossEntropyLoss()

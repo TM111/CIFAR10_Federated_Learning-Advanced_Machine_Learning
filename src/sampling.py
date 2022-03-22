@@ -142,6 +142,8 @@ def cifar_multimodal_noniid(train_set):
           random.shuffle(indexes)
         indexes=indexes[:size]
         user_images[key]=indexes
+    
+    
     return user_images
 
 
