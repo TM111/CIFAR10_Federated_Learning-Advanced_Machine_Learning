@@ -178,7 +178,7 @@ def get_cached_clients():
     except:
         None
         
-    file=str(ARGS.DISTRIBUTION)+str(ARGS.ALPHA)+str(ARGS.NUM_CLASS_RANGE[0])+str(ARGS.NUM_CLASS_RANGE[1])+str(ARGS.NUM_CLIENTS)
+    file=str(ARGS.DISTRIBUTION)+str(ARGS.ALPHA)+str(ARGS.NUM_CLASS_RANGE[0])+str(ARGS.NUM_CLASS_RANGE[1])+str(ARGS.NUM_CLIENTS)+str(ARGS.RATIO)+str(ARGS.Z)
     if(os.path.exists(dir+file)):
         with open(dir+file, 'rb') as config_dictionary_file:
             return pickle.load(config_dictionary_file)

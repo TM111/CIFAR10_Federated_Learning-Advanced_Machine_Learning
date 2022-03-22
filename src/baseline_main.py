@@ -80,10 +80,8 @@ if __name__ == '__main__':
         print("")
         print_weights(selected_clients,server_model)
     
-
       #SERVER MODEL -> CLIENTS
       clients=send_server_model_to_clients(server_model, clients)
-
     
       #TEST
       test_loss, server_accuracy = evaluate(server_model, test_loader)
