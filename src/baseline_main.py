@@ -91,11 +91,10 @@ if __name__ == '__main__':
       server_accuracy=round(server_accuracy,3)
       w_accuracy=round(weighted_accuracy(clients),3)
       seconds=str(round(float(time.time() - start_time),2))
-      print("After round "+str(i+1)+"  server accuracy: "+str(server_accuracy)+"    weighted accuracy: "+str(w_accuracy)+"   time: "+seconds+" sec.")
-    
+      print(f'After round {i+1:2d} \t server accuracy: {server_accuracy:.3f} \t weighted accuracy: {w_accuracy:.3f} \t time: {seconds} sec.')
     
     print("-----------------------------------------")
-    print("Final Accuracy of Main Model Federated Learning: "+str(server_accuracy))
-    print("Final Weighted Accuracy of Federated Learning: "+str(w_accuracy))
+    print(f'Final Accuracy of Main Model Federated Learning: {server_accuracy:.3f}')
+    print(f'Final Weighted Accuracy of Federated Learning: {w_accuracy:.3f}')
     print("//////////////////////////////////////////////////////////////////")
     print("")

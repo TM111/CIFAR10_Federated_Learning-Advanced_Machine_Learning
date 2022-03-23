@@ -47,7 +47,7 @@ def get_clients_list(train_loader_list, train_set, test_set):
                   w[label]=0
               else:
                   w[label]=p[label]/q[label]
-          w=torch.tensor(w)
+          w=torch.tensor(w).to(ARGS.DEVICE)
 
       crt=nn.CrossEntropyLoss(weight=w)
       
