@@ -21,13 +21,13 @@ if __name__ == '__main__':
         ARGS.SERVER_MOMENTUM=1
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
-        ARGS.DISTRIBUTION=2
+        ARGS.DISTRIBUTION=4
         ARGS.ALPHA=0.1
         ARGS.RATIO=0.6
-        ARGS.Z=4
+        ARGS.Z=2
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
-        ARGS.NUM_SELECTED_CLIENTS=10
+        ARGS.NUM_SELECTED_CLIENTS=3
         ARGS.NUM_EPOCHS=2
         
     if(ARGS.CENTRALIZED_MODE):
@@ -78,7 +78,7 @@ if __name__ == '__main__':
       server_model = send_client_updates_to_server_and_aggregate(server_model,selected_clients)
     
       #DEBUG: print size,sum_weights,sum_updates for each client
-      debug=0
+      debug=1
       if(debug):
         print("")
         print_weights(selected_clients,server_model)

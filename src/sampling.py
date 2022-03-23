@@ -150,6 +150,7 @@ def get_train_distribution(train_set):
      
     train_loader_list={}   #TRAIN LOADER DICT
     for user_id in train_user_images.keys():
+      train_user_images[user_id].sort()
       dataset_ = torch.utils.data.Subset(train_set, train_user_images[user_id])
       dataloader = torch.utils.data.DataLoader(dataset=dataset_, batch_size=ARGS.BATCH_SIZE, shuffle=False)
       train_loader_list[user_id]=dataloader
@@ -194,6 +195,7 @@ def generated_test_distribution(classes, test_set, num_samples):    # generate t
         test_user_images.append(i)
       if(len(test_user_images)==int(num_samples/len(classes))*count):
         break
+  test_user_images.sort()
   dataset_ = torch.utils.data.Subset(test_set, test_user_images)
   dataloader = torch.utils.data.DataLoader(dataset=dataset_, batch_size=ARGS.BATCH_SIZE)
   return dataloader
