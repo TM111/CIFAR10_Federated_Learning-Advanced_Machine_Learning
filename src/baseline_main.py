@@ -24,7 +24,7 @@ if __name__ == '__main__':
         ARGS.DISTRIBUTION=4
         ARGS.ALPHA=0.1
         ARGS.RATIO=0.6
-        ARGS.Z=2
+        ARGS.Z=4
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
         ARGS.NUM_SELECTED_CLIENTS=3
@@ -78,7 +78,7 @@ if __name__ == '__main__':
       server_model = send_client_updates_to_server_and_aggregate(server_model,selected_clients)
     
       #DEBUG: print size,sum_weights,sum_updates for each client
-      debug=1
+      debug=0
       if(debug):
         print("")
         print_weights(selected_clients,server_model)
