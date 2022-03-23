@@ -122,7 +122,6 @@ def cifar_multimodal_noniid(train_set):
     for i in range(len(train_set)):
       label=train_set[i][1]
       classes_dict[label].append(i)
-    
     client_id=-1
     for label in classes_dict.keys():
         for index in classes_dict[label]:
@@ -131,21 +130,6 @@ def cifar_multimodal_noniid(train_set):
                 if(label in user_classes[str(client_id)]):
                     user_images[str(client_id)].append(index)
                     break
-        
-    
-    #bilancio il dataset
-    size=len(train_set)
-    for key in user_images.keys():
-        size=min(len(user_images[key]),size)
-        
-    for key in user_images.keys():
-        indexes=user_images[key]
-        for i in range(random.randint(2,7)):
-          random.shuffle(indexes)
-        indexes=indexes[:size]
-        user_images[key]=indexes
-    
-    
     return user_images
 
 

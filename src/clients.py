@@ -29,12 +29,6 @@ def get_clients_list(train_loader_list, train_set, test_set):
         p=get_dataset_distribution(train_set)
         
     for i in range(ARGS.NUM_CLIENTS):
-      
-      if(len(train_loader_list[str(i)].dataset)%100==0):    # an epoch for every 100 images
-        local_epochs=int(len(train_loader_list[str(i)].dataset)/100)
-      else:
-        local_epochs=int(len(train_loader_list[str(i)].dataset)/100)+1
-      local_epochs=ARGS.NUM_EPOCHS
       classes=[]
       for data in train_loader_list[str(i)].dataset:
         if(data[1] not in classes):
@@ -57,8 +51,7 @@ def get_clients_list(train_loader_list, train_set, test_set):
 
       crt=nn.CrossEntropyLoss(weight=w)
       
-      
-      client=Client(i,net,train_loader_list[str(i)],opt,crt,local_epochs,test_loader)
+      client=Client(i,net,train_loader_list[str(i)],opt,crt,ARGS.NUM_EPOCHS,test_loader)
       clients_list.append(client)
     
     #cache clients list

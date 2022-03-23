@@ -16,7 +16,7 @@ if __name__ == '__main__':
         ARGS.ALGORITHM='FedAvg'  #FedAvg FedAvgM
         ARGS.FEDIR=False
         ARGS.FEDVC=False
-        ARGS.BATCH_NORM=0
+        ARGS.BATCH_NORM=1
         #ARGS.OPTIMIZER='adam'
         ARGS.SERVER_MOMENTUM=1
         ARGS.PRETRAIN=False
@@ -28,6 +28,7 @@ if __name__ == '__main__':
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
         ARGS.NUM_SELECTED_CLIENTS=10
+        ARGS.NUM_EPOCHS=2
         
     if(ARGS.CENTRALIZED_MODE):
         ARGS.DISTRIBUTION=2
