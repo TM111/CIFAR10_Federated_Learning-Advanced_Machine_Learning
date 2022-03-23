@@ -11,19 +11,19 @@ import random
 
 if __name__ == '__main__':
     if(ARGS.COLAB==0): #test locally
-        ARGS.MODEL='LeNet5'
+        ARGS.MODEL='resnet18'
         ARGS.DEVICE='cpu'
         ARGS.ALGORITHM='FedAvg'  #FedAvg FedAvgM
         ARGS.FEDIR=False
         ARGS.FEDVC=False
-        ARGS.BATCH_NORM=1
+        ARGS.BATCH_NORM=0
         ARGS.OPTIMIZER='adam'
         ARGS.SERVER_MOMENTUM=1
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
         ARGS.DISTRIBUTION=4
         ARGS.ALPHA=0.1
-        ARGS.RATIO=0.8
+        ARGS.RATIO=0.6
         ARGS.Z=4
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     for i in range(random.randint(2,7)):
       random.shuffle(clients)
     ind=0
-    print("Distribution of trainset for client "+str(ind),get_dataset_distribution(clients[ind].train_loader.dataset))
+    print("Distribution of trainset for client "+str(ind),get_dataset_distribution(clients[ind].train_loader.dataset),'size: '+str(len(clients[ind].train_loader.dataset)))
 
     print("Model: "+str(ARGS.MODEL))
     print("Dataset distribution: "+str(ARGS.DISTRIBUTION)+"  "+str(ARGS.ALPHA)+" ("+str(ARGS.NUM_CLASS_RANGE[0])+','+str(ARGS.NUM_CLASS_RANGE[1])+')')

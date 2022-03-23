@@ -7,6 +7,7 @@ import zipfile
 import random
 from options import ARGS
 import pickle as pickle
+from models import get_net_and_optimizer
 
 def cifar_parser(line, is_train=True):
   if is_train:
@@ -131,6 +132,7 @@ def cifar_multimodal_noniid(train_set):
                     user_images[str(client_id)].append(index)
                     break
         
+    
     #bilancio il dataset
     size=len(train_set)
     for key in user_images.keys():
@@ -183,7 +185,10 @@ def get_cached_clients():
     file=str(ARGS.DISTRIBUTION)+str(ARGS.ALPHA)+str(ARGS.NUM_CLASS_RANGE[0])+str(ARGS.NUM_CLASS_RANGE[1])+str(ARGS.NUM_CLIENTS)+str(ARGS.RATIO)+str(ARGS.Z)
     if(os.path.exists(dir+file)):
         with open(dir+file, 'rb') as config_dictionary_file:
-            return pickle.load(config_dictionary_file)
+            clients_list= pickle.load(config_dictionary_file)
+            for i in range(len(clients_list)):
+                clients_list[i].net, clients_list[i].optimizer=get_net_and_optimizer()
+            return clients_list
     else:
         files = [f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
         for f in files: os.remove(dir+f)

@@ -34,7 +34,8 @@ def get_clients_list(train_loader_list, train_set, test_set):
         local_epochs=int(len(train_loader_list[str(i)].dataset)/100)
       else:
         local_epochs=int(len(train_loader_list[str(i)].dataset)/100)+1
-        
+      
+      local_epochs=2
       classes=[]
       for data in train_loader_list[str(i)].dataset:
         if(data[1] not in classes):
