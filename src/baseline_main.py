@@ -11,7 +11,7 @@ import random
 
 if __name__ == '__main__':
     if(ARGS.COLAB==0): #test locally
-        ARGS.MODEL='resnet18'
+        ARGS.MODEL='LeNet5'
         ARGS.DEVICE='cpu'
         ARGS.ALGORITHM='FedAvg'  #FedAvg FedAvgM
         ARGS.FEDIR=False
@@ -21,7 +21,7 @@ if __name__ == '__main__':
         ARGS.SERVER_MOMENTUM=1
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
-        ARGS.DISTRIBUTION=4
+        ARGS.DISTRIBUTION=2
         ARGS.ALPHA=0.1
         ARGS.RATIO=0.6
         ARGS.Z=4

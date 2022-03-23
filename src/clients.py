@@ -35,7 +35,6 @@ def get_clients_list(train_loader_list, train_set, test_set):
       else:
         local_epochs=int(len(train_loader_list[str(i)].dataset)/100)+1
       
-      local_epochs=2
       classes=[]
       for data in train_loader_list[str(i)].dataset:
         if(data[1] not in classes):
@@ -69,7 +68,7 @@ def get_clients_list(train_loader_list, train_set, test_set):
         dir=os.getcwd()+"/clients_list_cache/"
         
         
-    file=str(ARGS.DISTRIBUTION)+str(ARGS.ALPHA)+str(ARGS.NUM_CLASS_RANGE[0])+str(ARGS.NUM_CLASS_RANGE[1])+str(ARGS.NUM_CLIENTS)+str(ARGS.RATIO)+str(ARGS.Z)
+    file=str(ARGS.DISTRIBUTION)+str(ARGS.ALPHA)+str(ARGS.NUM_CLASS_RANGE[0])+str(ARGS.NUM_CLASS_RANGE[1])+str(ARGS.NUM_CLIENTS)+str(ARGS.RATIO)+str(ARGS.Z)+str(ARGS.FEDIR)
     with open(dir+file, 'wb') as config_dictionary_file:
         pickle.dump(clients_list,config_dictionary_file)
     return clients_list
