@@ -97,6 +97,7 @@ def print_weights(clients,server_model):   # test to view if the algotihm is cor
         if u>max_u:
             max_u=u
             node=key
+            break
 
     for i in range(len(clients)):
       s=str(i+1)+')'+'S:'+str(len(clients[i].train_loader.dataset))

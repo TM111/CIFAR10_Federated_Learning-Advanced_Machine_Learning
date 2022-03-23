@@ -17,7 +17,7 @@ if __name__ == '__main__':
         ARGS.FEDIR=False
         ARGS.FEDVC=False
         ARGS.BATCH_NORM=0
-        ARGS.OPTIMIZER='adam'
+        #ARGS.OPTIMIZER='adam'
         ARGS.SERVER_MOMENTUM=1
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
