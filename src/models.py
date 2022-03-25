@@ -1,6 +1,7 @@
 import torch.nn as nn
 from statistics import mean 
 import torch.nn.functional as func
+import torch.nn.functional as F
 import torch.hub
 from options import ARGS
 import torchvision.models as m
@@ -20,12 +21,8 @@ class LeNet5(nn.Module):
     def __init__(self):
         super(LeNet5, self).__init__()
         
-        self.conv1 = nn.Sequential(nn.Conv2d(3, 6, kernel_size=5))
-        self.conv2 = nn.Sequential(nn.Conv2d(6, 16, kernel_size=5))
-        
-        if(ARGS.BATCH_NORM==True):
-            self.conv1.add_module('1',nn.BatchNorm2d(6)) #conv1.1
-            self.conv2.add_module('1',nn.BatchNorm2d(16)) #conv2.1
+        self.conv1=nn.Conv2d(3, 6, kernel_size=5)
+        self.conv2=nn.Conv2d(6, 16, kernel_size=5)
         
         self.classifier = nn.Sequential(
             nn.Linear(16*5*5, 120),
@@ -48,13 +45,8 @@ class LeNet5(nn.Module):
 class LeNet5_mod(nn.Module):
     def __init__(self):
         super(LeNet5_mod, self).__init__()
-        self.conv1 = nn.Sequential(nn.Conv2d(3, 64, kernel_size=5))
-        self.conv2 = nn.Sequential(nn.Conv2d(64, 64, kernel_size=5))
-        
-        if(ARGS.BATCH_NORM==True):
-            self.conv1.add_module('1',nn.BatchNorm2d(64)) #conv1.1
-            self.conv2.add_module('1',nn.BatchNorm2d(64)) #conv2.1
-
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=5)
+        self.conv2 = nn.Conv2d(64, 64, kernel_size=5)
         
         self.classifier = nn.Sequential(
             nn.Linear(64*5*5, 384),
@@ -81,7 +73,7 @@ class CNNCifar(nn.Module): #https://www.tensorflow.org/tutorials/images/cnn
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(32, 64, 3)
         self.conv3 = nn.Conv2d(64, 64, 3)
-        
+            
         self.classifier = nn.Sequential(
             nn.Flatten(),
             nn.Linear(64*4*4, 64),
@@ -96,12 +88,11 @@ class CNNCifar(nn.Module): #https://www.tensorflow.org/tutorials/images/cnn
         x = self.classifier(x)
         return x
 
-class CNNNet(nn.Module):  #◘https://github.com/simoninithomas/cifar-10-classifier-pytorch/blob/master/PyTorch%20Cifar-10%20Classifier.ipynb
+class CNNNet(nn.Module):  #https://github.com/simoninithomas/cifar-10-classifier-pytorch/blob/master/PyTorch%20Cifar-10%20Classifier.ipynb
     def __init__(self):
         super(CNNNet, self).__init__()
         
         # Convolutional layers
-                            #Init_channels, channels, kernel_size, padding) 
         self.conv1 = nn.Conv2d(3, 16, 3, padding=1)
         self.conv2 = nn.Conv2d(16, 32, 3, padding=1)
         self.conv3 = nn.Conv2d(32, 64, 3, padding=1)
@@ -131,13 +122,85 @@ class CNNNet(nn.Module):  #◘https://github.com/simoninithomas/cifar-10-classif
         x = self.dropout(x)
         x = self.fc2(x)
         return x
+
+class AllConvNet(nn.Module):
+
+    def __init__(self, dropout=False, nc=3, num_classes=10):
+        super(AllConvNet, self).__init__()
+        self.dropout = dropout
+        self.conv1 = nn.Conv2d(nc, 96, 3, padding=1)
+        self.conv2 = nn.Conv2d(96, 96, 3, padding=1)
+        self.conv3 = nn.Conv2d(96, 96, 3, padding=1, stride=2)
+        self.conv4 = nn.Conv2d(96, 192, 3, padding=1)
+        self.conv5 = nn.Conv2d(192, 192, 3, padding=1)
+        self.conv6 = nn.Conv2d(192, 192, 3, padding=1, stride=2)
+        self.conv7 = nn.Conv2d(192, 192, 3, padding=1)
+        self.conv8 = nn.Conv2d(192, 192, 1)
+        self.class_conv = nn.Conv2d(192, num_classes, 1)
+
+
+    def forward(self, x):
+        if self.dropout:
+            x = F.dropout(x, .2)
+        conv1_out = F.relu(self.conv1(x))
+        conv2_out = F.relu(self.conv2(conv1_out))
+        conv3_out = F.relu(self.conv3(conv2_out))
+        if self.dropout:
+            conv3_out = F.dropout(conv3_out, .5)
+        conv4_out = F.relu(self.conv4(conv3_out))
+        conv5_out = F.relu(self.conv5(conv4_out))
+        conv6_out = F.relu(self.conv6(conv5_out))
+        if self.dropout:
+            conv6_out = F.dropout(conv6_out, .5)
+        conv7_out = F.relu(self.conv7(conv6_out))
+        conv8_out = F.relu(self.conv8(conv7_out))
+
+        class_out = F.relu(self.class_conv(conv8_out))
+        pool_out = class_out.reshape(class_out.size(0), class_out.size(1), -1).mean(-1)
+        return pool_out
+
+
+def add_batch_norm(model):
+    if(model==None):
+        return
+    layers=list(dict(model.named_modules()).keys())
+    for layer in layers:
+        try:
+            new_layer=getattr(model, layer)
+        except: continue
     
+        if isinstance(new_layer, nn.Conv2d):
+            new_layer=nn.Sequential(new_layer,nn.BatchNorm2d(new_layer.out_channels))
+            setattr(model, layer, new_layer)
+            
+        elif isinstance(new_layer, nn.Sequential):
+            new_sequential=[]
+            for module in new_layer:
+                new_sequential.append(module)
+                if isinstance(module, nn.Conv2d):
+                    new_sequential.append(nn.BatchNorm2d(module.out_channels))
+            new_layer = nn.Sequential(*new_sequential)
+            setattr(model, layer, new_layer)
+    return model
+            
 def get_net_and_optimizer():
+      model=None
       if(ARGS.MODEL=="LeNet5"):
           model = LeNet5()
       elif(ARGS.MODEL=="LeNet5_mod"):
           model = LeNet5_mod()
-      elif(ARGS.MODEL=="mobilenet_v3_small"):
+      elif(ARGS.MODEL=="CNNCifar"):
+          model = CNNCifar()
+      elif(ARGS.MODEL=="CNNNet"):
+          model = CNNNet()
+      elif(ARGS.MODEL=="AllConvNet"):
+          model = AllConvNet()
+          
+       #ADD BATCH NORM
+      if(ARGS.BATCH_NORM):
+           model=add_batch_norm(model)
+           
+      if(ARGS.MODEL=="mobilenet_v3_small"):
           model = m.mobilenet_v3_small(pretrained=ARGS.PRETRAIN)
       elif(ARGS.MODEL=="resnet18"):
           model = m.resnet18(pretrained=ARGS.PRETRAIN)
@@ -145,12 +208,8 @@ def get_net_and_optimizer():
           model = m.densenet121(pretrained=ARGS.PRETRAIN)
       elif(ARGS.MODEL=="googlenet"):
           model = m.googlenet(pretrained=ARGS.PRETRAIN, aux_logits=False)
-      elif(ARGS.MODEL=="CNNCifar"):
-          model = CNNCifar()
-      elif(ARGS.MODEL=="CNNNet"):
-          model = CNNNet()
-      
-        
+
+
       #SET LAST LAYER OUTPUT=NUM_CLASSES
       classifier_name=list(dict(model.named_modules()).keys())[len(list(dict(model.named_modules()).keys()))-1].split(".")[0]
       classifier=getattr(model, classifier_name)

@@ -129,6 +129,7 @@ def train_clients(clients):
     for i in range(len(clients)): 
         #SET MODEL
         clients[i].net = clients[i].net.to(ARGS.DEVICE) # this will bring the network to GPU if DEVICE is cuda
+        clients[i].net.train()
         cudnn.benchmark # Calling this optimizes runtime
         if i == 0:
             previousW=copy.deepcopy(clients[0].net.state_dict())  #save the weights     θ ← θt

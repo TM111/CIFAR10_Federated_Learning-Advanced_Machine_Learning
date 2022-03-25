@@ -26,8 +26,8 @@ if __name__ == '__main__':
         ARGS.RATIO=0.6
         ARGS.Z=4
         #ARGS.CENTRALIZED_MODE=True
-        ARGS.NUM_CLIENTS=100
-        ARGS.NUM_SELECTED_CLIENTS=3
+        ARGS.NUM_CLIENTS=1
+        ARGS.NUM_SELECTED_CLIENTS=1
         ARGS.NUM_EPOCHS=2
         
     if(ARGS.CENTRALIZED_MODE):
