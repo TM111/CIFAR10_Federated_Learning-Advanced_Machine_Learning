@@ -189,8 +189,7 @@ def get_net_and_optimizer():
           if(ARGS.BATCH_NORM): model=add_batch_norm(model)
                
       elif(ARGS.MODEL in large_nets):
-          if(ARGS.MODEL=="googlenet"): model = m.googlenet(pretrained=ARGS.PRETRAIN)
-          else: model = globals()[ARGS.MODEL](pretrained=ARGS.PRETRAIN)
+          globals()[ARGS.MODEL](pretrained=ARGS.PRETRAIN)
            
           #SET LAST LAYER OUTPUT=NUM_CLASSES
           classifier_name=list(dict(model.named_modules()).keys())[len(list(dict(model.named_modules()).keys()))-1].split(".")[0]
