@@ -4,7 +4,7 @@ import torch.nn.functional as func
 import torch.nn.functional as F
 import torch.hub
 from options import ARGS
-import torchvision.models as m
+import importlib
 import torch.optim
 
 '''
@@ -153,6 +153,7 @@ class AllConvNet(nn.Module):
         conv8_out = F.relu(self.conv8(conv7_out))
 
         class_out = F.relu(self.class_conv(conv8_out))
+        print(class_out.size())
         pool_out = class_out.reshape(class_out.size(0), class_out.size(1), -1).mean(-1)
         return pool_out
 
@@ -189,7 +190,10 @@ def get_net_and_optimizer():
           if(ARGS.BATCH_NORM): model=add_batch_norm(model)
                
       elif(ARGS.MODEL in large_nets):
-          globals()[ARGS.MODEL](pretrained=ARGS.PRETRAIN)
+          if(ARGS.MODEL == 'googlenet'): 
+              model= getattr(importlib.import_module('torchvision.models'),'googlenet')(pretrained=ARGS.PRETRAIN,aux_logits=False)
+          else: 
+              model= getattr(importlib.import_module('torchvision.models'),'googlenet')(pretrained=ARGS.PRETRAIN)
            
           #SET LAST LAYER OUTPUT=NUM_CLASSES
           classifier_name=list(dict(model.named_modules()).keys())[len(list(dict(model.named_modules()).keys()))-1].split(".")[0]

@@ -37,6 +37,10 @@ if __name__ == '__main__':
         ARGS.FEDIR=False
         ARGS.FEDVC=False
     
+    if(ARGS.ALGORITHM=='FedSGD'):
+        ARGS.NUM_EPOCHS=1
+        ARGS.BATCH_SIZE=999999
+    
     
     train_set, test_set, train_loader, test_loader = get_dataset()  #download dataset
     
