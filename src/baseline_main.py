@@ -11,12 +11,13 @@ import random
 
 if __name__ == '__main__':
     if(ARGS.COLAB==0): #test locally
-        ARGS.MODEL='LeNet5'
+        ARGS.MODEL='LeNet5_mod'
         ARGS.DEVICE='cpu'
         ARGS.ALGORITHM='FedAvg'  #FedAvg FedAvgM
         ARGS.FEDIR=False
         ARGS.FEDVC=False
         ARGS.BATCH_NORM=1
+        ARGS.MU=0
         #ARGS.OPTIMIZER='adam'
         ARGS.SERVER_MOMENTUM=1
         ARGS.PRETRAIN=False
@@ -26,8 +27,8 @@ if __name__ == '__main__':
         ARGS.RATIO=0.6
         ARGS.Z=4
         #ARGS.CENTRALIZED_MODE=True
-        ARGS.NUM_CLIENTS=1
-        ARGS.NUM_SELECTED_CLIENTS=1
+        ARGS.NUM_CLIENTS=100
+        ARGS.NUM_SELECTED_CLIENTS=10
         ARGS.NUM_EPOCHS=2
         
     if(ARGS.CENTRALIZED_MODE):

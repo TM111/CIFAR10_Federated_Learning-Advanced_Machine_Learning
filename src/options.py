@@ -17,6 +17,8 @@ def args_parser():
                         help="number of rounds of training")
     parser.add_argument('--SERVER_LR', type=int, default=1,
                         help="number of rounds of training")
+    parser.add_argument('--MU', type=float, default=0,
+                        help="number of rounds of training")
     parser.add_argument('--LR', type=float, default=0.01,
                         help="number of rounds of training")
     parser.add_argument('--MOMENTUM', type=float, default=0.9,

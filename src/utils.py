@@ -121,7 +121,18 @@ def send_server_model_to_clients(main_model, clients):
 
 
 
-
+#FEDPROX
+def difference_models_norm_2(model_1, model_2): # ||w - w^t||^2
+    """Return the norm 2 difference between the two model parameters
+    """
+    
+    tensor_1=list(model_1.parameters())
+    tensor_2=list(model_2.parameters())
+    
+    norm=sum([torch.sum((tensor_1[i]-tensor_2[i])**2) 
+        for i in range(len(tensor_1))])
+    
+    return norm
 
 
 #TRAIN ALL CLIENTS
@@ -132,7 +143,8 @@ def train_clients(clients):
         clients[i].net.train()
         cudnn.benchmark # Calling this optimizes runtime
         if i == 0:
-            previousW=copy.deepcopy(clients[0].net.state_dict())  #save the weights     θ ← θt
+            previous_model=copy.deepcopy(clients[0].net)  #save the weights     θ ← θt
+            previousW=previous_model.state_dict()  #save the weights     θ ← θt
         
         #SET LOADER AND EPOCH
         if(ARGS.FEDVC):
@@ -141,7 +153,7 @@ def train_clients(clients):
             else:
                 indexes=[random.randint(0,len(clients[i].train_loader.dataset)-1) for idx in range(ARGS.NVC)]
             loader = torch.utils.data.DataLoader(dataset=torch.utils.data.Subset(clients[i].train_loader.dataset,indexes), batch_size=ARGS.BATCH_SIZE)
-            epochs=clients[i].local_epochs
+            epochs = clients[i].local_epochs
         else:
             loader=clients[i].train_loader
             epochs=clients[i].local_epochs
@@ -160,6 +172,9 @@ def train_clients(clients):
               outputs = clients[i].net(images)
               # Compute loss based on output and ground truth
               loss = clients[i].criterion(outputs, labels)
+              
+              if ARGS.MU>0: #FEDPROX https://epione.gitlabpages.inria.fr/flhd/federated_learning/FedAvg_FedProx_MNIST_iid_and_noniid.html
+                  loss = loss + ARGS.MU/2*difference_models_norm_2(clients[i].net,previous_model) 
               
               # Compute gradients for each layer and update weights
               loss.backward()  # backward pass: computes gradients
