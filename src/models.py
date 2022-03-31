@@ -7,15 +7,6 @@ from options import ARGS
 import importlib
 import torch.optim
 
-'''
-lenet5
-resnet18
-
-pretrained ad freeze (transferlearning):
-mobilenet
-googlenet
-'''
-
 #DEFINE NETWORKS
 class LeNet5(nn.Module):
     def __init__(self):
@@ -153,12 +144,11 @@ class AllConvNet(nn.Module):
         conv8_out = F.relu(self.conv8(conv7_out))
 
         class_out = F.relu(self.class_conv(conv8_out))
-        print(class_out.size())
         pool_out = class_out.reshape(class_out.size(0), class_out.size(1), -1).mean(-1)
         return pool_out
 
 
-def add_batch_norm(model): #only for first category of network
+def add_batch_norm(model):
     layers=list(dict(model.named_modules()).keys())
     for layer in layers:
         try:
@@ -181,19 +171,19 @@ def add_batch_norm(model): #only for first category of network
             
 
 def get_net_and_optimizer():
-      small_nets=["LeNet5","LeNet5_mod","CNNCifar","CNNNet""AllConvNet"]
+      small_nets=["LeNet5","LeNet5_mod","CNNCifar","CNNNet","AllConvNet"]
       large_nets=["mobilenet_v3_small","resnet18","densenet121","googlenet"] 
         
       if(ARGS.MODEL in small_nets):
           model = globals()[ARGS.MODEL]()
-          ARGS.FREEZE=0  #must be deactivated for first category of networks
           if(ARGS.BATCH_NORM): model=add_batch_norm(model)
+          parameters_to_optimize=model.parameters()
                
       elif(ARGS.MODEL in large_nets):
           if(ARGS.MODEL == 'googlenet'): 
               model= getattr(importlib.import_module('torchvision.models'),'googlenet')(pretrained=ARGS.PRETRAIN,aux_logits=False)
           else: 
-              model= getattr(importlib.import_module('torchvision.models'),'googlenet')(pretrained=ARGS.PRETRAIN)
+              model= getattr(importlib.import_module('torchvision.models'),ARGS.MODEL)(pretrained=ARGS.PRETRAIN)
            
           #SET LAST LAYER OUTPUT=NUM_CLASSES
           classifier_name=list(dict(model.named_modules()).keys())[len(list(dict(model.named_modules()).keys()))-1].split(".")[0]
@@ -205,15 +195,15 @@ def get_net_and_optimizer():
               classifier = nn.Linear(classifier.in_features, ARGS.NUM_CLASSES)
           setattr(model, classifier_name, classifier)
               
-      #FREEZING CONVOLUTIONAL LAYERS
-      parameters_to_optimize=model.parameters()
-      if(ARGS.FREEZE): 
-          for param in model.parameters():
-              param.requires_grad = False
-   
-          for param in classifier.parameters():
-              param.requires_grad = True
-          parameters_to_optimize=classifier.parameters()
+          #FREEZING CONVOLUTIONAL LAYERS
+          parameters_to_optimize=model.parameters()
+          if(ARGS.FREEZE): 
+              for param in model.parameters():
+                  param.requires_grad = False
+       
+              for param in classifier.parameters():
+                  param.requires_grad = True
+              parameters_to_optimize=classifier.parameters()
           
       if(ARGS.OPTIMIZER=="sgd"):
           optimizer = torch.optim.SGD(parameters_to_optimize, lr=ARGS.LR, momentum=ARGS.MOMENTUM)

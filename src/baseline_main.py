@@ -1,9 +1,8 @@
-from sampling import dirichlet_distribution, cifar_iid, cifar_noniid, get_train_distribution,get_cached_clients
+from sampling import get_train_distribution,get_cached_clients
 from utils import get_dataset,send_server_model_to_clients, select_clients, train_clients, send_client_updates_to_server_and_aggregate, print_weights, weighted_accuracy,get_dataset_distribution
 from options import ARGS
 from clients import get_clients_list
 from models import get_net_and_optimizer, evaluate
-import torch.optim
 import torch.nn as nn
 import time
 import random
@@ -13,22 +12,22 @@ if __name__ == '__main__':
     if(ARGS.COLAB==0): #test locally
         ARGS.MODEL='LeNet5_mod'
         ARGS.DEVICE='cpu'
-        ARGS.ALGORITHM='FedAvg'  #FedAvg FedAvgM
+        ARGS.ALGORITHM='FedNova'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova
         ARGS.FEDIR=False
         ARGS.FEDVC=False
         ARGS.BATCH_NORM=1
-        ARGS.MU=0
+        ARGS.MU=0.4
         #ARGS.OPTIMIZER='adam'
         ARGS.SERVER_MOMENTUM=1
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
-        ARGS.DISTRIBUTION=4
+        ARGS.DISTRIBUTION=2
         ARGS.ALPHA=0.1
-        ARGS.RATIO=0.6
-        ARGS.Z=4
+        ARGS.RATIO=0.7
+        ARGS.Z=3
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
-        ARGS.NUM_SELECTED_CLIENTS=10
+        ARGS.NUM_SELECTED_CLIENTS=3
         ARGS.NUM_EPOCHS=2
         
     if(ARGS.CENTRALIZED_MODE):
@@ -54,7 +53,8 @@ if __name__ == '__main__':
       random.shuffle(clients)
     ind=0
     print("Distribution of trainset for client "+str(ind),get_dataset_distribution(clients[ind].train_loader.dataset),'size: '+str(len(clients[ind].train_loader.dataset)))
-
+            
+            
     print("Model: "+str(ARGS.MODEL))
     print("Dataset distribution: "+str(ARGS.DISTRIBUTION)+"  "+str(ARGS.ALPHA)+" ("+str(ARGS.NUM_CLASS_RANGE[0])+','+str(ARGS.NUM_CLASS_RANGE[1])+')')
     print("Number of clients: "+str(ARGS.NUM_CLIENTS))
@@ -83,7 +83,7 @@ if __name__ == '__main__':
       server_model = send_client_updates_to_server_and_aggregate(server_model,selected_clients)
     
       #DEBUG: print size,sum_weights,sum_updates for each client
-      debug=0
+      debug=1
       if(debug):
         print("")
         print_weights(selected_clients,server_model)
@@ -92,11 +92,11 @@ if __name__ == '__main__':
       clients=send_server_model_to_clients(server_model, clients)
     
       #TEST
+      seconds=str(round(float(time.time() - start_time),2))
       test_loss, server_accuracy = evaluate(server_model, test_loader)
       server_accuracy=round(server_accuracy,3)
       w_accuracy=round(weighted_accuracy(clients),3)
-      seconds=str(round(float(time.time() - start_time),2))
-      print(f'After round {i+1:2d} \t server accuracy: {server_accuracy:.3f} \t weighted accuracy: {w_accuracy:.3f} \t time: {seconds} sec.')
+      print(f'After round {i+1:2d} \t server accuracy: {server_accuracy:.3f} \t weighted accuracy: {w_accuracy:.3f} \t train time: {seconds} sec.')
     
     print("-----------------------------------------")
     print(f'Final Accuracy of Main Model Federated Learning: {server_accuracy:.3f}')
