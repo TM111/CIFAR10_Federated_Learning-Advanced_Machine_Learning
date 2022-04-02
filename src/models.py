@@ -176,7 +176,6 @@ def get_net_and_optimizer():
         
       if(ARGS.MODEL in small_nets):
           model = globals()[ARGS.MODEL]()
-          if(ARGS.BATCH_NORM): model=add_batch_norm(model)
           parameters_to_optimize=model.parameters()
                
       elif(ARGS.MODEL in large_nets):
@@ -195,15 +194,20 @@ def get_net_and_optimizer():
               classifier = nn.Linear(classifier.in_features, ARGS.NUM_CLASSES)
           setattr(model, classifier_name, classifier)
               
-          #FREEZING CONVOLUTIONAL LAYERS
-          parameters_to_optimize=model.parameters()
-          if(ARGS.FREEZE): 
-              for param in model.parameters():
-                  param.requires_grad = False
-       
-              for param in classifier.parameters():
-                  param.requires_grad = True
-              parameters_to_optimize=classifier.parameters()
+         
+      #ADD BATCH NORMALIZATION
+      if(ARGS.BATCH_NORM): 
+          model=add_batch_norm(model)
+      
+      #FREEZING CONVOLUTIONAL LAYERS
+      parameters_to_optimize=model.parameters()
+      if(ARGS.FREEZE): 
+          for param in model.parameters():
+              param.requires_grad = False
+ 
+          for param in classifier.parameters():
+              param.requires_grad = True
+          parameters_to_optimize=classifier.parameters()
           
       if(ARGS.OPTIMIZER=="sgd"):
           optimizer = torch.optim.SGD(parameters_to_optimize, lr=ARGS.LR, momentum=ARGS.MOMENTUM, weight_decay=ARGS.WEIGHT_DECAY)

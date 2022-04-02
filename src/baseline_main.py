@@ -1,6 +1,6 @@
 from sampling import get_train_distribution,get_cached_clients
 from utils import get_dataset,send_server_model_to_clients, select_clients, train_clients, send_client_updates_to_server_and_aggregate, print_weights, weighted_accuracy,get_dataset_distribution
-from options import ARGS
+from options import ARGS, check_arguments
 from clients import get_clients_list
 from server import Server
 from models import evaluate
@@ -10,38 +10,40 @@ import random
 
 if __name__ == '__main__':
     if(ARGS.COLAB==0): #test locally
-        ARGS.MODEL='LeNet5_mod'
+    
         ARGS.DEVICE='cpu'
-        ARGS.ALGORITHM='SCAFFOLD'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
-        ARGS.FEDIR=False
-        ARGS.FEDVC=False
+        
+        ARGS.MODEL='LeNet5_mod' # LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, 
+        ARGS.NUM_EPOCHS=2                     # mobilenet_v3_small, resnet18, densenet121, googlenet 
         ARGS.BATCH_NORM=1
-        ARGS.WEIGHT_DECAY=0
-        ARGS.MU=0.4
-        #ARGS.OPTIMIZER='adam'
-        ARGS.SERVER_MOMENTUM=1
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
-        ARGS.DISTRIBUTION=4
-        ARGS.ALPHA=0.1
-        ARGS.RATIO=0.8
-        ARGS.Z=2
-        #ARGS.CENTRALIZED_MODE=True
+        
+        ARGS.ALGORITHM='FedAvg'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
+        
+        ARGS.DISTRIBUTION='multimodal' # iid, non_iid, dirichlet, multimodal
+        ARGS.CENTRALIZED_MODE=False
         ARGS.NUM_CLIENTS=100
         ARGS.NUM_SELECTED_CLIENTS=3
-        ARGS.NUM_EPOCHS=2
+
+    if(ARGS.ALGORITHM == 'FedAvgM'):
+        ARGS.SERVER_MOMENTUM=0.5
         
-    if(ARGS.CENTRALIZED_MODE):
-        ARGS.ALGORITHM='FedAvg'
-        ARGS.DISTRIBUTION=2
-        ARGS.NUM_CLIENTS=1
-        ARGS.NUM_SELECTED_CLIENTS=1
-        ARGS.FEDIR=False
-        ARGS.FEDVC=False
+    if(ARGS.ALGORITHM == 'FedProx'):
+        ARGS.MU=0.4
     
-    if(ARGS.ALGORITHM=='FedSGD'):
-        ARGS.NUM_EPOCHS=1
-        ARGS.BATCH_SIZE=999999
+    if(ARGS.DISTRIBUTION == 'non_iid'):
+        ARGS.NUM_CLASS_RANGE=[1,7]
+    
+    if(ARGS.DISTRIBUTION == 'dirichlet'):
+        ARGS.ALPHA=0.05
+    
+    if(ARGS.DISTRIBUTION == 'multimodal'):
+        ARGS.RATIO=0.8
+        ARGS.Z=2
+    
+    
+    check_arguments() # control arguments
     
     train_set, test_set, train_loader, test_loader = get_dataset()  #download dataset
 

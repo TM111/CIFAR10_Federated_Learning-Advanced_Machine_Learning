@@ -136,16 +136,16 @@ def cifar_multimodal_noniid(train_set):
 
 
 def get_train_distribution(train_set):
-    if(ARGS.DISTRIBUTION==1):  # https://github.com/google-research/google-research/tree/master/federated_vision_datasets
+    if(ARGS.DISTRIBUTION=='dirichlet'):  # https://github.com/google-research/google-research/tree/master/federated_vision_datasets
       train_user_images=dirichlet_distribution()
     
-    elif(ARGS.DISTRIBUTION==2):
+    elif(ARGS.DISTRIBUTION=='iid'):
       train_user_images=cifar_iid(train_set)
     
-    elif(ARGS.DISTRIBUTION==3):  # https://towardsdatascience.com/preserving-data-privacy-in-deep-learning-part-2-6c2e9494398b
+    elif(ARGS.DISTRIBUTION=='non_iid'):  # https://towardsdatascience.com/preserving-data-privacy-in-deep-learning-part-2-6c2e9494398b
       train_user_images=cifar_noniid(train_set)
       
-    elif(ARGS.DISTRIBUTION==4):  # https://arxiv.org/pdf/2008.05687.pdf
+    elif(ARGS.DISTRIBUTION=='multimodal'):  # https://arxiv.org/pdf/2008.05687.pdf
       train_user_images=cifar_multimodal_noniid(train_set)
      
     train_loader_list={}   #TRAIN LOADER DICT

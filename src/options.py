@@ -1,5 +1,6 @@
 import argparse
-    
+import sys
+
 def args_parser():
     parser = argparse.ArgumentParser()
     
@@ -80,3 +81,80 @@ def args_parser():
     return args
 
 ARGS=args_parser() # global variable
+
+
+models=["LeNet5","LeNet5_mod","CNNCifar","CNNNet","AllConvNet","mobilenet_v3_small","resnet18","densenet121","googlenet"]
+algorithms=['FedAvg', 'FedAvgM', 'FedSGD', 'FedProx', 'FedNova', 'SCAFFOLD']
+distributions=['iid', 'non_iid', 'dirichlet', 'multimodal']
+alphas=[0, 0.05, 0.1, 0.20, 0.5, 1, 10, 100]
+
+def check_arguments():
+    errors=''
+    errors_count=0
+    
+    if(ARGS.MODEL not in models):
+        errors_count+=1
+        errors += str(errors_count)+') Model must be one of them: '
+        for m in models: errors += m+', '
+        errors = errors[:-2]+'.\n\n'
+        
+    if(ARGS.ALGORITHM not in algorithms):
+        errors_count+=1
+        errors += str(errors_count)+') Algorithm must be one of them: '
+        for a in algorithms: errors += a+', '
+        errors = errors[:-2]+'.\n\n'
+        
+    if(ARGS.DISTRIBUTION not in distributions):
+        errors_count+=1
+        errors += str(errors_count)+') Distribution must be one of them: '
+        for d in distributions: errors += d+', '
+        errors = errors[:-2]+'.\n\n'
+    
+    if(ARGS.DISTRIBUTION == 'dirichlet' and ARGS.NUM_CLIENTS!=100):
+        errors_count+=1
+        errors += str(errors_count)+') For dirichlet distribution NUM_CLIENTS must be 100.\n\n'
+    
+    if(ARGS.DISTRIBUTION == 'dirichlet' and ARGS.ALPHA not in alphas):
+        errors_count+=1
+        errors += str(errors_count)+') Alpha must be one of them: '
+        for a in alphas: errors += str(a)+', '
+        errors = errors[:-2]+'.\n\n'
+    
+    if(ARGS.DISTRIBUTION == 'multimodal' and (ARGS.RATIO<0 or ARGS.RATIO>1)):
+        errors_count+=1
+        errors += str(errors_count)+') Ratio must be between 0 and 1.\n\n'
+    
+    if(ARGS.DISTRIBUTION == 'multimodal' and (ARGS.Z<1 or ARGS.Z>4)):
+        errors_count+=1
+        errors += str(errors_count)+') Z must be between 1 and 4.\n\n'
+        
+    if(errors_count>0):
+        sys.exit(errors)
+    
+    #set default arguments
+    
+    if(ARGS.ALGORITHM == 'FedSGD'): 
+        ARGS.NUM_EPOCHS=1
+        ARGS.BATCH_SIZE=999999
+        
+    if(ARGS.ALGORITHM in ['FedProx', 'FedNova', 'SCAFFOLD']):
+        ARGS.FEDIR=False
+        ARGS.FEDVC=False
+    
+    if(ARGS.CENTRALIZED_MODE):
+        ARGS.ALGORITHM='FedAvg'
+        ARGS.DISTRIBUTION='iid'
+        ARGS.NUM_CLIENTS=1
+        ARGS.NUM_SELECTED_CLIENTS=1
+        ARGS.FEDIR=False
+        ARGS.FEDVC=False
+        
+    if(ARGS.MODEL not in ["LeNet5","LeNet5_mod","CNNCifar","CNNNet","AllConvNet"]):
+        ARGS.PRETRAIN=False
+        ARGS.FREEZE=False
+    
+    if(ARGS.MODEL not in ["mobilenet_v3_small","resnet18","densenet121","googlenet"]):
+        ARGS.BATCH_NORM=0
+        
+        
+        
