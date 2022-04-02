@@ -27,9 +27,8 @@ def get_dataset():
 
 
 
-previous_updates=None   #vt-1  for FedAvgM algorithm
 #Calculate AVG for each clients updates
-def average_weights(n_list, local_updates_list, tau_list):           # AggregateClient()
+def average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list):           # AggregateClient()
 
     total_n=sum(n for n in n_list)
     
@@ -56,7 +55,7 @@ def average_weights(n_list, local_updates_list, tau_list):           # Aggregate
             coeff = coeff + a_i_list[i] * n_list[i] / total_n
         ARGS.SERVER_LR=coeff
         
-    elif(ARGS.ALGORITHM in ['FedAvg','FedAvgM','FedSGD','FedProx']):
+    elif(ARGS.ALGORITHM in ['FedAvg','FedAvgM','FedSGD','FedProx','SCAFFOLD']):
         if(ARGS.FEDVC):  #standard average
             for key in updates_avg.keys():
                 for i in range(len(local_updates_list)):
@@ -70,41 +69,54 @@ def average_weights(n_list, local_updates_list, tau_list):           # Aggregate
                 updates_avg[key] = torch.div(updates_avg[key], total_n)
             
         if(ARGS.ALGORITHM=='FedAvgM'):
-            global previous_updates
-            if(previous_updates is not None):
+            if(Server.previous_updates is not None):
                 for key in updates_avg.keys():
-                    updates_avg[key]=ARGS.SERVER_MOMENTUM*previous_updates[key] + updates_avg[key]
-            previous_updates=copy.deepcopy(updates_avg)
+                    updates_avg[key] = ARGS.SERVER_MOMENTUM * Server.previous_updates[key] + updates_avg[key]
+            Server.previous_updates = copy.deepcopy(updates_avg)
             
-    return updates_avg
+        if(ARGS.ALGORITHM=='SCAFFOLD'): #https://github.com/Xtra-Computing/NIID-Bench
+            # Update c_global
+            total_delta = copy.deepcopy(Server.model.state_dict())
+            for key in total_delta:
+                total_delta[key] = total_delta[key]*0.0
+                
+            for c_delta in c_delta_list:
+                for key in total_delta:
+                    total_delta[key] = total_delta[key] + c_delta[key]
+            
+            for key in Server.c_global:
+                Server.c_global[key] = Server.c_global[key] + total_delta[key] / len(c_delta_list)
+            
+    return Server, updates_avg
 
 
 
 
 #CLIENTS UPDATES -> SERVER & AVERAGE
-def send_client_updates_to_server_and_aggregate(server_model,clients):
+def send_client_updates_to_server_and_aggregate(Server,clients):
     
     # Information to be sent to server
     n_list=[]                   # size of local dataset
     local_updates_list=[]
     tau_list=[]                 # tau for FedNova (optimizer step)
-    for c in clients:
-        n_list.append(len(c.train_loader.dataset))
-        local_updates_list.append(copy.deepcopy(c.updates))
-        
+    c_delta_list=[]             # c_deltas for SCAFFOLD
+    for client in clients:
+        n_list.append(len(client.train_loader.dataset))
+        local_updates_list.append(copy.deepcopy(client.updates))
         if(ARGS.ALGORITHM=='FedNova'):
-            tau=sum(1 for epoch in range(c.local_epochs) for batch in c.train_loader)
-            tau_list.append(tau)
+            tau_list.append(client.tau)
+        elif(ARGS.ALGORITHM=='SCAFFOLD'):
+            c_delta_list.append(client.c_delta)
             
     # Aggregate
-    updates = average_weights(n_list, local_updates_list, tau_list) 
+    Server, updates = average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list) 
     
     # Update global model
-    w=server_model.state_dict()
+    w=Server.model.state_dict()
     for key in w.keys():
       w[key] = w[key]-ARGS.SERVER_LR*updates[key]    # θt+1 ← θt - γgt
-    server_model.load_state_dict(copy.deepcopy(w))
-    return server_model
+    Server.model.load_state_dict(copy.deepcopy(w))
+    return Server
 
 
 
@@ -121,7 +133,6 @@ def print_weights(clients,server_model):   # test to view if the algotihm is cor
         if('bias' in key or 'weight' in key):
             node=key
             break
-
     for i in range(len(clients)):
       s=str(i+1)+')'+'S:'+str(len(clients[i].train_loader.dataset))
       we=str(round(torch.sum(w[i][node]).tolist(),3))
@@ -135,11 +146,13 @@ def print_weights(clients,server_model):   # test to view if the algotihm is cor
 
 
 #SERVER MODEL -> CLIENTS
-def send_server_model_to_clients(main_model, clients):
-    with torch.no_grad():
-      w=main_model.state_dict()
-      for i in range(len(clients)):
-        clients[i].net.load_state_dict(copy.deepcopy(w))
+def send_server_model_to_clients(Server, clients):
+    w=Server.model.state_dict()
+    for i in range(len(clients)):
+      clients[i].net.load_state_dict(copy.deepcopy(w)) # send global model to clients
+      if(ARGS.ALGORITHM=='SCAFFOLD'): # send c_global to clients
+          clients[i].c_global=Server.c_global
+          
     return clients
 
 
@@ -188,10 +201,19 @@ def train_clients(clients):
                   tensor_2=list(previous_model.parameters())
                   norm=sum([torch.sum((tensor_1[i]-tensor_2[i])**2) for i in range(len(tensor_1))]) # ||w - w^t||^2
                   loss = loss + ARGS.MU/2*norm
-              
+                  
               # Compute gradients for each layer and update weights
               loss.backward()  # backward pass: computes gradients
               clients[i].optimizer.step() # update weights based on accumulated gradients
+              
+              if(ARGS.ALGORITHM=='SCAFFOLD'):
+                  net_para = clients[i].net.state_dict()
+                  for key in net_para:
+                      net_para[key] = net_para[key] - ARGS.LR * (clients[i].c_global[key] - clients[i].c_local[key]) # c_global - c_local (variance reduction)
+                  clients[i].net.load_state_dict(net_para)
+
+                  
+                  
 
 
         #CALCULATE UPDATE   Δθ ← θt - θ
@@ -199,6 +221,14 @@ def train_clients(clients):
         for key in updates.keys():
           updates[key] = previousW[key] - updates[key]
         clients[i].updates=copy.deepcopy(updates)
+        
+        if(ARGS.ALGORITHM=='SCAFFOLD'):
+            # Update c_local and calculate delta
+            c_new = copy.deepcopy(clients[i].c_local)
+            for key in clients[i].c_local:
+                c_new[key] = c_new[key] - clients[i].c_global[key] + updates[key] / (clients[i].tau * ARGS.LR)
+                clients[i].c_delta[key] = c_new[key] - clients[i].c_local[key]
+            clients[i].c_local = c_new
     return clients
 
 

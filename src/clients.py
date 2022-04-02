@@ -6,10 +6,11 @@ from options import ARGS
 from utils import get_dataset_distribution
 import os
 import pickle as pickle
+import copy
 
 #Client datastructure
 class Client():
-    def __init__(self, id,net,train_lr,test_lr,optimizer,criterion,local_epochs):
+    def __init__(self, id,net,train_lr,test_lr,optimizer,criterion,local_epochs, c_local):
         self.id = id
         self.net=net
         self.train_loader=train_lr
@@ -19,16 +20,22 @@ class Client():
         self.criterion=criterion
         self.local_epochs=local_epochs
         
-        self.updates=net.state_dict() #Δθ memorizes the updates after last training
-        for key in self.updates.keys():
-          self.updates[key] = self.updates[key]*0
+        self.updates=None #Δθ memorizes the updates after last training
+        
+        self.tau=sum(1 for epoch in range(local_epochs) for batch in train_lr)  # number of optimizer step
+
+        self.c_local=copy.deepcopy(c_local)  # local control variates (SCAFFOLD)
+        self.c_delta=copy.deepcopy(c_local)  # delta c (SCAFFOLD)
+        self.c_global=copy.deepcopy(c_local) # server control variates (SCAFFOLD)
+        
+
         
 
 #Istance list of clients
 def get_clients_list(train_loader_list, train_set, test_set):
     clients_list=[]
     
-    if(ARGS.FEDIR):
+    if(ARGS.ALGORITHM in ['FedAvg','FedAvgM','FedSGD'] and ARGS.FEDIR):
         p=get_dataset_distribution(train_set)
         
     for i in range(ARGS.NUM_CLIENTS):
@@ -54,7 +61,12 @@ def get_clients_list(train_loader_list, train_set, test_set):
 
       crt=nn.CrossEntropyLoss(weight=w)
       
-      client=Client(i,net,train_loader_list[str(i)],test_loader,opt,crt,ARGS.NUM_EPOCHS)
+      c_local=None
+      if(ARGS.ALGORITHM=='SCAFFOLD'):
+          c_local=copy.deepcopy(net.state_dict()) # local control variates (SCAFFOLD)
+          for key in c_local: c_local[key] = c_local[key]*0.0
+          
+      client=Client(i,net,train_loader_list[str(i)],test_loader,opt,crt,ARGS.NUM_EPOCHS, c_local)
       clients_list.append(client)
     
     #cache clients list

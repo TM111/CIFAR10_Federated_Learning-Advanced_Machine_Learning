@@ -120,7 +120,7 @@ class AllConvNet(nn.Module):
     #https://arxiv.org/pdf/1412.6806.pdf
     #https://github.com/StefOe/all-conv-pytorch/blob/master/allconv.py
 
-    def __init__(self, dropout=False, num_classes=10,c=16):
+    def __init__(self, dropout=False, c=16):
         super(AllConvNet, self).__init__()
         self.dropout = dropout
         self.conv1 = nn.Conv2d(3, c, 3)
@@ -131,7 +131,7 @@ class AllConvNet(nn.Module):
         self.conv6 = nn.Conv2d(c*2, c*2, 3,stride=2)
         self.conv7 = nn.Conv2d(c*2, c*2, 3)
         self.conv8 = nn.Conv2d(c*2, c*2, 1)
-        self.class_conv = nn.Conv2d(c*2, num_classes, 1)
+        self.class_conv = nn.Conv2d(c*2, ARGS.NUM_CLASSES, 1)
 
     def forward(self, x):
         conv1_out = F.relu(self.conv1(x))
@@ -206,9 +206,9 @@ def get_net_and_optimizer():
               parameters_to_optimize=classifier.parameters()
           
       if(ARGS.OPTIMIZER=="sgd"):
-          optimizer = torch.optim.SGD(parameters_to_optimize, lr=ARGS.LR, momentum=ARGS.MOMENTUM)
+          optimizer = torch.optim.SGD(parameters_to_optimize, lr=ARGS.LR, momentum=ARGS.MOMENTUM, weight_decay=ARGS.WEIGHT_DECAY)
       elif(ARGS.OPTIMIZER=="adam"):
-          optimizer = torch.optim.Adam(parameters_to_optimize, lr=ARGS.LR)
+          optimizer = torch.optim.Adam(parameters_to_optimize, lr=ARGS.LR, weight_decay=ARGS.WEIGHT_DECAY)
       return model, optimizer
        
 
