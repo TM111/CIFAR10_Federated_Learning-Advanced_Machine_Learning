@@ -60,6 +60,10 @@ if __name__ == '__main__':
             
     print("-----------------------------------------")
     print("Model:",ARGS.MODEL)
+    print("Batch norm:",ARGS.BATCH_NORM)
+    print("Freeze:",ARGS.FREEZE)
+    print("Pretrain:",ARGS.PRETRAIN)
+    
     print("Dataset distribution:",ARGS.DISTRIBUTION)
     if(ARGS.DISTRIBUTION=="dirichlet"):
         print("Alpha: ",ARGS.ALPHA)
