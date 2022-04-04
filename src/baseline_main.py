@@ -9,7 +9,7 @@ import random
 
 
 if __name__ == '__main__':
-    if(ARGS.COLAB==0): #test locally
+    if(ARGS.COLAB == 0): #test locally
     
         ARGS.DEVICE='cpu'
         

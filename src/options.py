@@ -48,7 +48,7 @@ def args_parser():
     
     parser.add_argument('--CENTRALIZED_MODE', type=int, default=0,
                         help="number of rounds of training")
-    parser.add_argument('--DISTRIBUTION', type=int, default=1,
+    parser.add_argument('--DISTRIBUTION', type=str, default='iid',
                         help="number of rounds of training")
     
     parser.add_argument('--ALPHA', type=float, default=0.5,
@@ -89,6 +89,15 @@ distributions=['iid', 'non_iid', 'dirichlet', 'multimodal']
 alphas=[0, 0.05, 0.1, 0.20, 0.5, 1, 10, 100]
 
 def check_arguments():
+    #set default arguments
+    if(ARGS.CENTRALIZED_MODE):
+        ARGS.ALGORITHM='FedAvg'
+        ARGS.DISTRIBUTION='iid'
+        ARGS.NUM_CLIENTS=1
+        ARGS.NUM_SELECTED_CLIENTS=1
+        ARGS.FEDIR=False
+        ARGS.FEDVC=False
+        
     errors=''
     errors_count=0
     
@@ -132,20 +141,11 @@ def check_arguments():
         sys.exit(errors)
     
     #set default arguments
-    
     if(ARGS.ALGORITHM == 'FedSGD'): 
         ARGS.NUM_EPOCHS=1
         ARGS.BATCH_SIZE=999999
         
     if(ARGS.ALGORITHM in ['FedProx', 'FedNova', 'SCAFFOLD']):
-        ARGS.FEDIR=False
-        ARGS.FEDVC=False
-    
-    if(ARGS.CENTRALIZED_MODE):
-        ARGS.ALGORITHM='FedAvg'
-        ARGS.DISTRIBUTION='iid'
-        ARGS.NUM_CLIENTS=1
-        ARGS.NUM_SELECTED_CLIENTS=1
         ARGS.FEDIR=False
         ARGS.FEDVC=False
         
