@@ -93,6 +93,7 @@ def check_arguments():
     if(ARGS.CENTRALIZED_MODE):
         ARGS.ALGORITHM='FedAvg'
         ARGS.DISTRIBUTION='iid'
+        ARGS.SERVER_LR=1
         ARGS.NUM_CLIENTS=1
         ARGS.NUM_SELECTED_CLIENTS=1
         ARGS.FEDIR=False

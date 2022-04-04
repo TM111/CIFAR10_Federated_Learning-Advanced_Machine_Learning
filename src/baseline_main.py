@@ -14,7 +14,7 @@ if __name__ == '__main__':
         ARGS.DEVICE='cpu'
         
         ARGS.MODEL='LeNet5' # LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, 
-        ARGS.NUM_EPOCHS=2                     # mobilenet_v3_small, resnet18, densenet121, googlenet 
+        ARGS.NUM_EPOCHS=1                     # mobilenet_v3_small, resnet18, densenet121, googlenet 
         ARGS.BATCH_NORM=1
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
@@ -22,7 +22,7 @@ if __name__ == '__main__':
         ARGS.ALGORITHM='FedAvg'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
         
         ARGS.DISTRIBUTION='multimodal' # iid, non_iid, dirichlet, multimodal
-        #ARGS.CENTRALIZED_MODE=True
+        ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
         ARGS.NUM_SELECTED_CLIENTS=3
 

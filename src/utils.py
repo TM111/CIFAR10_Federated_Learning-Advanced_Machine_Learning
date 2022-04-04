@@ -237,6 +237,8 @@ def train_clients(clients):
 
 #WEIGHTED ACCURACY
 def weighted_accuracy(clients):
+  if(ARGS.CENTRALIZED_MODE):
+      return 0
   sum=0
   num_samples=0
   for i in range(len(clients)):
