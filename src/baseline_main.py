@@ -13,7 +13,7 @@ if __name__ == '__main__':
     
         ARGS.DEVICE='cpu'
         
-        ARGS.MODEL='LeNet5_mod' # LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, 
+        ARGS.MODEL='LeNet5' # LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, 
         ARGS.NUM_EPOCHS=2                     # mobilenet_v3_small, resnet18, densenet121, googlenet 
         ARGS.BATCH_NORM=1
         ARGS.PRETRAIN=False
@@ -22,7 +22,7 @@ if __name__ == '__main__':
         ARGS.ALGORITHM='FedAvg'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
         
         ARGS.DISTRIBUTION='multimodal' # iid, non_iid, dirichlet, multimodal
-        ARGS.CENTRALIZED_MODE=False
+        #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
         ARGS.NUM_SELECTED_CLIENTS=3
 
@@ -58,12 +58,18 @@ if __name__ == '__main__':
     ind=0
     print("Distribution of trainset for client "+str(ind),get_dataset_distribution(Clients[ind].train_loader.dataset),'size: '+str(len(Clients[ind].train_loader.dataset)))
             
-
-    print("Model: "+str(ARGS.MODEL))
-    print("Dataset distribution: "+str(ARGS.DISTRIBUTION)+"  "+str(ARGS.ALPHA)+" ("+str(ARGS.NUM_CLASS_RANGE[0])+','+str(ARGS.NUM_CLASS_RANGE[1])+')')
-    print("Number of clients: "+str(ARGS.NUM_CLIENTS))
-    print("Number of selected clients: "+str(ARGS.NUM_SELECTED_CLIENTS))
-    print("Number of rounds: "+str(ARGS.ROUNDS))
+    print("-----------------------------------------")
+    print("Model:",ARGS.MODEL)
+    print("Dataset distribution:",ARGS.DISTRIBUTION)
+    if(ARGS.DISTRIBUTION=="dirichlet"):
+        print("Alpha: ",ARGS.ALPHA)
+    if(ARGS.DISTRIBUTION=="multimodal"):
+        print("Ratio: ",ARGS.RATIO,"  Z:",ARGS.Z)
+    if(ARGS.DISTRIBUTION=="non_iid"):
+        print("Class range: ",ARGS.NUM_CLASS_RANGE)
+    print("Number of clients:",ARGS.NUM_CLIENTS)
+    print("Number of selected clients:",ARGS.NUM_SELECTED_CLIENTS)
+    print("Number of rounds:",ARGS.ROUNDS)
     print("-----------------------------------------")
     
     #INSTANCE SERVER
@@ -86,7 +92,7 @@ if __name__ == '__main__':
       Server = send_client_updates_to_server_and_aggregate(Server,selected_clients)
     
       #DEBUG: print size,sum_weights,sum_updates for each client
-      debug=1
+      debug=0
       if(debug):
         print("")
         print_weights(selected_clients,Server.model)
@@ -96,10 +102,9 @@ if __name__ == '__main__':
     
       #TEST
       seconds=str(round(float(time.time() - start_time),2))
-      test_loss, server_accuracy = evaluate(Server.model, test_loader)
-      #server_accuracy=round(server_accuracy,3)
-      w_accuracy=round(weighted_accuracy(clients),3)
-      print(f'After round {i+1:2d} \t server accuracy: {server_accuracy:.3f} \t weighted accuracy: {w_accuracy:.3f} \t train time: {seconds} sec.')
+      server_loss, server_accuracy = evaluate(Server.model, test_loader)
+      w_accuracy=weighted_accuracy(clients)
+      print(f'After round {i+1:2d} \t server accuracy: {server_accuracy:.3f} \t server loss: {server_loss:.3f} \t weighted accuracy: {w_accuracy:.3f} \t train time: {seconds} sec.')
     
     print("-----------------------------------------")
     print(f'Final Accuracy of Main Model Federated Learning: {server_accuracy:.3f}')
