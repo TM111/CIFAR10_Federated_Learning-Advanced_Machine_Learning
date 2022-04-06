@@ -120,9 +120,8 @@ class AllConvNet(nn.Module):
     #https://arxiv.org/pdf/1412.6806.pdf
     #https://github.com/StefOe/all-conv-pytorch/blob/master/allconv.py
 
-    def __init__(self, dropout=False, c=16):
+    def __init__(self,  c=64):
         super(AllConvNet, self).__init__()
-        self.dropout = dropout
         self.conv1 = nn.Conv2d(3, c, 3)
         self.conv2 = nn.Conv2d(c, c, 3)
         self.conv3 = nn.Conv2d(c, c, 3,stride=2)
