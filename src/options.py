@@ -150,11 +150,11 @@ def check_arguments():
         ARGS.FEDIR=False
         ARGS.FEDVC=False
         
-    if(ARGS.MODEL not in ["LeNet5","LeNet5_mod","CNNCifar","CNNNet","AllConvNet"]):
+    if(ARGS.MODEL in ["LeNet5","LeNet5_mod","CNNCifar","CNNNet","AllConvNet"]):
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
     
-    if(ARGS.MODEL not in ["mobilenet_v3_small","resnet18","densenet121","googlenet"]):
+    if(ARGS.MODEL in ["mobilenet_v3_small","resnet18","densenet121","googlenet"]):
         ARGS.BATCH_NORM=0
         
         
