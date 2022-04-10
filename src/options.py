@@ -83,7 +83,7 @@ def args_parser():
 ARGS=args_parser() # global variable
 
 
-models=['ResNet18_',"LeNet5","LeNet5_mod","CNNCifar","CNNNet","AllConvNet","mobilenet_v3_small","resnet18","densenet121","googlenet"]
+models=["LeNet5","LeNet5_mod","CNNCifar","CNNNet","AllConvNet","mobilenet_v3_small","resnet18","densenet121","googlenet"]
 algorithms=['FedAvg', 'FedAvgM', 'FedSGD', 'FedProx', 'FedNova', 'SCAFFOLD']
 distributions=['iid', 'non_iid', 'dirichlet', 'multimodal']
 alphas=[0, 0.05, 0.1, 0.20, 0.5, 1, 10, 100]
