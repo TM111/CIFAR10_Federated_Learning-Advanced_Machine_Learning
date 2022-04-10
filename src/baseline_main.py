@@ -30,7 +30,7 @@ if __name__ == '__main__':
         ARGS.SERVER_MOMENTUM=0.9
         
     if(ARGS.ALGORITHM == 'FedProx'):
-        ARGS.MU=0.4 # 0.001, 0.01, 0.1, 0.5, 1
+        ARGS.MU=0.3
     
     if(ARGS.DISTRIBUTION == 'non_iid'):
         ARGS.NUM_CLASS_RANGE=[1,7]
