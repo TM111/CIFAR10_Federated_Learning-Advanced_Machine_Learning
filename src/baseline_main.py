@@ -39,8 +39,8 @@ if __name__ == '__main__':
         ARGS.ALPHA=0.05  # 0, 0.05, 0.1, 0.20, 0.5, 1, 10, 100
     
     if(ARGS.DISTRIBUTION == 'multimodal'):
-        ARGS.RATIO=0.8
-        ARGS.Z=2
+        ARGS.RATIO=0.8     # 0.25 ,0.5, 0.75
+        ARGS.Z=3
     
     
     check_arguments() # control arguments

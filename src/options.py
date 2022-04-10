@@ -40,7 +40,7 @@ def args_parser():
                         help="number of rounds of training")
     parser.add_argument('--FEDVC', type=int, default=0,
                         help="number of rounds of training")
-    parser.add_argument('--NVC', type=int, default=200,
+    parser.add_argument('--NVC', type=int, default=256,
                         help="number of rounds of training")
     
     parser.add_argument('--BATCH_NORM', type=int, default=0,
