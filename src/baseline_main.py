@@ -71,6 +71,13 @@ if __name__ == '__main__':
         print("Ratio: ",ARGS.RATIO,"  Z:",ARGS.Z)
     if(ARGS.DISTRIBUTION=="non_iid"):
         print("Class range: ",ARGS.NUM_CLASS_RANGE)
+        
+    print("Algorithm:",ARGS.ALGORITHM)
+    if(ARGS.DISTRIBUTION=="FedAvgM"):
+        print("Server momentum: ",ARGS.SERVER_MOMENTUM)
+    if(ARGS.DISTRIBUTION=="FedProx"):
+        print("Mu: ",ARGS.MU)
+        
     print("Number of clients:",ARGS.NUM_CLIENTS)
     print("Number of selected clients:",ARGS.NUM_SELECTED_CLIENTS)
     print("Number of rounds:",ARGS.ROUNDS)
