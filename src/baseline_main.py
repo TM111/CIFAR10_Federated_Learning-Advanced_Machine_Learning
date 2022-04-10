@@ -14,7 +14,7 @@ if __name__ == '__main__':
         ARGS.DEVICE='cpu'
         
         ARGS.MODEL='LeNet5' # LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, 
-        ARGS.NUM_EPOCHS=1                     # mobilenet_v3_small, resnet18, densenet121, googlenet 
+        ARGS.NUM_EPOCHS=2                     # mobilenet_v3_small, resnet18, densenet121, googlenet 
         ARGS.BATCH_NORM=1
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
@@ -27,16 +27,16 @@ if __name__ == '__main__':
         ARGS.NUM_SELECTED_CLIENTS=3
 
     if(ARGS.ALGORITHM == 'FedAvgM'):
-        ARGS.SERVER_MOMENTUM=0.5
+        ARGS.SERVER_MOMENTUM=0.9
         
     if(ARGS.ALGORITHM == 'FedProx'):
-        ARGS.MU=0.4
+        ARGS.MU=0.4 # 0.001, 0.01, 0.1, 0.5, 1
     
     if(ARGS.DISTRIBUTION == 'non_iid'):
         ARGS.NUM_CLASS_RANGE=[1,7]
     
     if(ARGS.DISTRIBUTION == 'dirichlet'):
-        ARGS.ALPHA=0.05
+        ARGS.ALPHA=0.05  # 0, 0.05, 0.1, 0.20, 0.5, 1, 10, 100
     
     if(ARGS.DISTRIBUTION == 'multimodal'):
         ARGS.RATIO=0.8
@@ -73,6 +73,7 @@ if __name__ == '__main__':
         print("Class range: ",ARGS.NUM_CLASS_RANGE)
         
     print("Algorithm:",ARGS.ALGORITHM)
+    print("FedIR:",ARGS.FEDIR,"   FedVC:",ARGS.FEDVC)
     if(ARGS.DISTRIBUTION=="FedAvgM"):
         print("Server momentum: ",ARGS.SERVER_MOMENTUM)
     if(ARGS.DISTRIBUTION=="FedProx"):
