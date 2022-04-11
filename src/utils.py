@@ -67,7 +67,7 @@ def average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list):
                 for i in range(len(local_updates_list)):
                     updates_avg[key] = updates_avg[key] + local_updates_list[i][key]*n_list[i]
                 updates_avg[key] = torch.div(updates_avg[key], total_n)
-            
+                
         if(ARGS.ALGORITHM == 'FedAvgM'):
             if(Server.previous_updates is not None):
                 for key in updates_avg.keys():
@@ -128,7 +128,7 @@ def print_weights(clients,server_model):   # test to view if the algotihm is cor
     for c in clients:
       w.append(c.net.state_dict())
     w_avg=server_model.state_dict()
-    
+    print("")
     for key in clients[0].updates.keys():
         if('bias' in key or 'weight' in key):
             node=key

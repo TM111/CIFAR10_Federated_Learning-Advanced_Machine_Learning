@@ -16,7 +16,7 @@ def args_parser():
                         help="number of rounds of training")
     parser.add_argument('--BATCH_SIZE', type=int, default=64,
                         help="number of rounds of training")
-    parser.add_argument('--SERVER_LR', type=int, default=1,
+    parser.add_argument('--SERVER_LR', type=float, default=1,
                         help="number of rounds of training")
     parser.add_argument('--MU', type=float, default=0,
                         help="number of rounds of training")
@@ -147,8 +147,8 @@ def check_arguments():
         ARGS.BATCH_SIZE=999999
         
     if(ARGS.ALGORITHM in ['FedProx', 'FedNova', 'SCAFFOLD']):
-        ARGS.FEDIR=False
-        ARGS.FEDVC=False
+        ARGS.FEDIR=0
+        ARGS.FEDVC=0
         
     if(ARGS.MODEL in ["LeNet5","LeNet5_mod","CNNCifar","CNNNet","AllConvNet"]):
         ARGS.PRETRAIN=False

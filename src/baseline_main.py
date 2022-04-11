@@ -19,12 +19,12 @@ if __name__ == '__main__':
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
         
-        ARGS.ALGORITHM='FedAvg'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
+        ARGS.ALGORITHM='FedAvgM'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
         
-        ARGS.DISTRIBUTION='multimodal' # iid, non_iid, dirichlet, multimodal
-        ARGS.CENTRALIZED_MODE=True
+        ARGS.DISTRIBUTION='iid' # iid, non_iid, dirichlet, multimodal
+        #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
-        ARGS.NUM_SELECTED_CLIENTS=3
+        ARGS.NUM_SELECTED_CLIENTS=2
 
     if(ARGS.ALGORITHM == 'FedAvgM'):
         ARGS.SERVER_MOMENTUM=0.9
@@ -101,13 +101,11 @@ if __name__ == '__main__':
       selected_clients=train_clients(selected_clients)
       
       #CLIENTS UPDATES -> SERVER & AVERAGE
-      Server = send_client_updates_to_server_and_aggregate(Server,selected_clients)
+      Server = send_client_updates_to_server_and_aggregate(Server, selected_clients)
     
       #DEBUG: print size,sum_weights,sum_updates for each client
       debug=0
-      if(debug):
-        print("")
-        print_weights(selected_clients,Server.model)
+      if(debug): print_weights(selected_clients, Server.model)
     
       #SERVER MODEL -> CLIENTS
       clients=send_server_model_to_clients(Server, Clients)
