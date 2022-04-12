@@ -144,7 +144,7 @@ def check_arguments():
     #set default arguments
     if(ARGS.ALGORITHM == 'FedSGD'): 
         ARGS.NUM_EPOCHS=1
-        ARGS.BATCH_SIZE=999999
+        ARGS.BATCH_SIZE=10000
         
     if(ARGS.ALGORITHM in ['FedProx', 'FedNova', 'SCAFFOLD']):
         ARGS.FEDIR=0
