@@ -41,8 +41,7 @@ if __name__ == '__main__':
     if(ARGS.DISTRIBUTION == 'multimodal'):
         ARGS.RATIO=0.8     # 0.25 ,0.5, 0.75
         ARGS.Z=3
-    
-    
+
     check_arguments() # control arguments
     
     train_set, test_set, train_loader, test_loader = get_dataset()  #download dataset

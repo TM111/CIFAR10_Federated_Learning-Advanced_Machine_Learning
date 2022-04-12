@@ -166,8 +166,9 @@ def get_cached_clients():
         os.mkdir(dir)
     except:
         None
-        
-    file=str(ARGS.DISTRIBUTION)+str(ARGS.ALPHA)+str(ARGS.NUM_CLASS_RANGE[0])+str(ARGS.NUM_CLASS_RANGE[1])+str(ARGS.NUM_CLIENTS)+str(ARGS.RATIO)+str(ARGS.Z)+str(ARGS.FEDIR)
+    
+    fedsgd=1 if(ARGS.ALGORITHM=='FedSGD') else 0
+    file=str(ARGS.DISTRIBUTION)+str(ARGS.ALPHA)+str(ARGS.NUM_CLASS_RANGE[0])+str(ARGS.NUM_CLASS_RANGE[1])+str(ARGS.NUM_CLIENTS)+str(ARGS.RATIO)+str(ARGS.Z)+str(ARGS.FEDIR)+str(fedsgd)
     if(os.path.exists(dir+file)):
         with open(dir+file, 'rb') as config_dictionary_file:
             clients_list= pickle.load(config_dictionary_file)

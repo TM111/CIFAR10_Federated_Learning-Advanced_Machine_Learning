@@ -74,7 +74,8 @@ def get_clients_list(train_loader_list, train_set, test_set):
         dir="/content/clients_list_cache/"
     else:
         dir=os.getcwd()+"/clients_list_cache/"
-    file=str(ARGS.DISTRIBUTION)+str(ARGS.ALPHA)+str(ARGS.NUM_CLASS_RANGE[0])+str(ARGS.NUM_CLASS_RANGE[1])+str(ARGS.NUM_CLIENTS)+str(ARGS.RATIO)+str(ARGS.Z)+str(ARGS.FEDIR)
+    fedsgd=1 if(ARGS.ALGORITHM=='FedSGD') else 0
+    file=str(ARGS.DISTRIBUTION)+str(ARGS.ALPHA)+str(ARGS.NUM_CLASS_RANGE[0])+str(ARGS.NUM_CLASS_RANGE[1])+str(ARGS.NUM_CLIENTS)+str(ARGS.RATIO)+str(ARGS.Z)+str(ARGS.FEDIR)+str(fedsgd)
     with open(dir+file, 'wb') as config_dictionary_file:
         pickle.dump(clients_list,config_dictionary_file)
     return clients_list
