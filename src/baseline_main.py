@@ -19,7 +19,7 @@ if __name__ == '__main__':
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
         
-        ARGS.ALGORITHM='FedAvgM'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
+        ARGS.ALGORITHM='FedSGD'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
         
         ARGS.DISTRIBUTION='iid' # iid, non_iid, dirichlet, multimodal
         #ARGS.CENTRALIZED_MODE=True
