@@ -225,6 +225,7 @@ def train_clients(clients):
             # Update c_local and calculate delta
             c_new = copy.deepcopy(clients[i].c_local)
             for key in clients[i].c_local:
+                updates[key].to('cpu')
                 c_new[key] = c_new[key] - clients[i].c_global[key] + updates[key] / (clients[i].tau * ARGS.LR)
                 clients[i].c_delta[key] = c_new[key] - clients[i].c_local[key]
             clients[i].c_local = c_new
