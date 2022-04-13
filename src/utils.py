@@ -181,7 +181,7 @@ def train_clients(clients):
             loader=clients[i].train_loader
             epochs=clients[i].local_epochs
         
-        if(ARGS.ALGORITHM=='SCAFFOLD'):
+        if(ARGS.ALGORITHM=='SCAFFOLD' and 1==0):
             for key in clients[i].c_global:
                 clients[i].c_global[key] = clients[i].c_global[key].to(ARGS.DEVICE)
                 clients[i].c_local[key] = clients[i].c_local[key].to(ARGS.DEVICE)
@@ -216,7 +216,6 @@ def train_clients(clients):
                   for key in net_para:
                       net_para[key] = net_para[key] - ARGS.LR * (clients[i].c_global[key] - clients[i].c_local[key]) # c_global - c_local (variance reduction)
                   clients[i].net.load_state_dict(net_para)
-                  clients[i].net = clients[i].net.to(ARGS.DEVICE)
 
 
         #CALCULATE UPDATE   Δθ ← θt - θ
