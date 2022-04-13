@@ -21,7 +21,7 @@ if __name__ == '__main__':
         
         ARGS.ALGORITHM='SCAFFOLD'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
         
-        ARGS.DISTRIBUTION='non_iid' # iid, non_iid, dirichlet, multimodal
+        ARGS.DISTRIBUTION='dirichlet' # iid, non_iid, dirichlet, multimodal
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
         ARGS.NUM_SELECTED_CLIENTS=10
@@ -29,12 +29,6 @@ if __name__ == '__main__':
     if(ARGS.DISTRIBUTION == 'non_iid'):
         ARGS.NUM_CLASS_RANGE=[1,7]
     
-    if(ARGS.DISTRIBUTION == 'dirichlet'):
-        ARGS.ALPHA=0.05  # 0, 0.05, 0.1, 0.20, 0.5, 1, 10, 100
-    
-    if(ARGS.DISTRIBUTION == 'multimodal'):
-        ARGS.RATIO=0.8     # 0.25 ,0.5, 0.75
-        ARGS.Z=3
 
     check_arguments() # control arguments
     
