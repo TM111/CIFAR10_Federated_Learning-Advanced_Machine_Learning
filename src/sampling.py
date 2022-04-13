@@ -182,6 +182,7 @@ def get_cached_clients():
                     clients_list[i].c_local=copy.deepcopy(c_local)  # local control variates (SCAFFOLD)
                     clients_list[i].c_delta=copy.deepcopy(c_local)  # delta c (SCAFFOLD)
                     clients_list[i].c_global=copy.deepcopy(c_local) # server control variates (SCAFFOLD)
+                    print(clients_list[i].c_local.get_device())
             return clients_list
     else:
         files = [f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
