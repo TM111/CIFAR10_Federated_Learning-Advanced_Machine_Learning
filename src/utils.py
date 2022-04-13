@@ -208,6 +208,7 @@ def train_clients(clients):
               
               if(ARGS.ALGORITHM=='SCAFFOLD'):
                   net_para = clients[i].net.state_dict()
+                  clients[i].net = clients[i].net.to('cpu')
                   for key in net_para:
                       print(net_para[key].get_device(),clients[i].c_global[key].get_device(),clients[i].c_local[key].get_device())
                       net_para[key] = net_para[key] - ARGS.LR * (clients[i].c_global[key] - clients[i].c_local[key]) # c_global - c_local (variance reduction)
