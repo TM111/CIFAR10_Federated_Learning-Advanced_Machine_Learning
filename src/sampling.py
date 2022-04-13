@@ -176,7 +176,6 @@ def get_cached_clients():
             for i in range(len(clients_list)):
                 clients_list[i].net, clients_list[i].optimizer=get_net_and_optimizer()
                 if(ARGS.ALGORITHM=='SCAFFOLD'):
-                    clients_list[i].net.to(ARGS.DEVICE)
                     c_local=copy.deepcopy(clients_list[i].net.state_dict()) # local control variates (SCAFFOLD)
                     for key in c_local: c_local[key] = c_local[key]*0.0
                     clients_list[i].c_local=copy.deepcopy(c_local)  # local control variates (SCAFFOLD)
