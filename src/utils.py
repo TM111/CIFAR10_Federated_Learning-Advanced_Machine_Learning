@@ -181,7 +181,7 @@ def train_clients(clients):
             loader=clients[i].train_loader
             epochs=clients[i].local_epochs
         
-        if(ARGS.ALGORITHM=='SCAFFOLD' and 1==0):
+        if(ARGS.ALGORITHM=='SCAFFOLD'):
             for key in clients[i].c_global:
                 clients[i].c_global[key] = clients[i].c_global[key].to(ARGS.DEVICE)
                 clients[i].c_local[key] = clients[i].c_local[key].to(ARGS.DEVICE)
