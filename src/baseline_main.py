@@ -19,18 +19,12 @@ if __name__ == '__main__':
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
         
-        ARGS.ALGORITHM='FedSGD'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
+        ARGS.ALGORITHM='SCAFFOLD'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
         
-        ARGS.DISTRIBUTION='iid' # iid, non_iid, dirichlet, multimodal
+        ARGS.DISTRIBUTION='non_iid' # iid, non_iid, dirichlet, multimodal
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
-        ARGS.NUM_SELECTED_CLIENTS=2
-
-    if(ARGS.ALGORITHM == 'FedAvgM'):
-        ARGS.SERVER_MOMENTUM=0.9
-        
-    if(ARGS.ALGORITHM == 'FedProx'):
-        ARGS.MU=0.3
+        ARGS.NUM_SELECTED_CLIENTS=10
     
     if(ARGS.DISTRIBUTION == 'non_iid'):
         ARGS.NUM_CLASS_RANGE=[1,7]

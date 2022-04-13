@@ -10,7 +10,7 @@ def args_parser():
                         help="number of rounds of training")
     
     # federated arguments (Notation for the arguments followed from paper)
-    parser.add_argument('--NUM_EPOCHS', type=int, default=1,
+    parser.add_argument('--NUM_EPOCHS', type=int, default=2,
                         help="number of rounds of training")
     parser.add_argument('--NUM_CLASSES', type=int, default=10,
                         help="number of rounds of training")
@@ -18,13 +18,13 @@ def args_parser():
                         help="number of rounds of training")
     parser.add_argument('--SERVER_LR', type=float, default=1,
                         help="number of rounds of training")
-    parser.add_argument('--MU', type=float, default=0,
+    parser.add_argument('--MU', type=float, default=0.3,
                         help="number of rounds of training")
     parser.add_argument('--LR', type=float, default=0.01,
                         help="number of rounds of training")
     parser.add_argument('--MOMENTUM', type=float, default=0.9,
                         help="number of rounds of training")
-    parser.add_argument('--SERVER_MOMENTUM', type=float, default=0,
+    parser.add_argument('--SERVER_MOMENTUM', type=float, default=0.9,
                         help="number of rounds of training")
     parser.add_argument('--WEIGHT_DECAY', type=float, default=4e-4,
                         help="number of rounds of training")

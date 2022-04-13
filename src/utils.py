@@ -212,9 +212,6 @@ def train_clients(clients):
                       net_para[key] = net_para[key] - ARGS.LR * (clients[i].c_global[key] - clients[i].c_local[key]) # c_global - c_local (variance reduction)
                   clients[i].net.load_state_dict(net_para)
 
-                  
-                  
-
 
         #CALCULATE UPDATE   Δθ ← θt - θ
         updates=clients[i].net.state_dict()
