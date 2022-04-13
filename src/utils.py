@@ -207,7 +207,7 @@ def train_clients(clients):
               clients[i].optimizer.step() # update weights based on accumulated gradients
               
               if(ARGS.ALGORITHM=='SCAFFOLD'):
-                  clients[i].net = clients[i].net.to('cpu')
+                  #clients[i].net = clients[i].net.to('cpu')
                   net_para = clients[i].net.state_dict()
                   for key in net_para:
                       net_para[key] = net_para[key] - ARGS.LR * (clients[i].c_global[key] - clients[i].c_local[key]) # c_global - c_local (variance reduction)
@@ -225,7 +225,6 @@ def train_clients(clients):
             # Update c_local and calculate delta
             c_new = copy.deepcopy(clients[i].c_local)
             for key in clients[i].c_local:
-                updates[key].to('cpu')
                 c_new[key] = c_new[key] - clients[i].c_global[key] + updates[key] / (clients[i].tau * ARGS.LR)
                 clients[i].c_delta[key] = c_new[key] - clients[i].c_local[key]
             clients[i].c_local = c_new
