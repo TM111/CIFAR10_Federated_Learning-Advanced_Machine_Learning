@@ -68,6 +68,8 @@ def args_parser():
                         help="number of rounds of training")
     parser.add_argument('--ROUNDS', type=int, default=30,
                         help="number of rounds of training")
+    parser.add_argument('--COUNT', type=int, default=0,
+                        help="number of rounds of training")
     
 
 
@@ -156,6 +158,4 @@ def check_arguments():
     
     if(ARGS.MODEL in ["mobilenet_v3_small","resnet18","densenet121","googlenet"]):
         ARGS.BATCH_NORM=0
-        
-        
-        
+   

@@ -26,8 +26,6 @@ if __name__ == '__main__':
         ARGS.NUM_CLIENTS=100
         ARGS.NUM_SELECTED_CLIENTS=10
     
-    if(ARGS.DISTRIBUTION == 'non_iid'):
-        ARGS.NUM_CLASS_RANGE=[1,7]
     
 
     check_arguments() # control arguments
@@ -46,6 +44,7 @@ if __name__ == '__main__':
     print("Distribution of trainset for client "+str(ind),get_dataset_distribution(Clients[ind].train_loader.dataset),'size: '+str(len(Clients[ind].train_loader.dataset)))
             
     print("-----------------------------------------")
+    print("Count:",ARGS.COUNT)
     print("Model:",ARGS.MODEL)
     print("Batch norm:",ARGS.BATCH_NORM)
     print("Freeze:",ARGS.FREEZE)
