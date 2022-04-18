@@ -102,7 +102,7 @@ def send_client_updates_to_server_and_aggregate(Server,clients):
     c_delta_list=[]             # c_deltas for SCAFFOLD
     for client in clients:
         n_list.append(len(client.train_loader.dataset))
-        local_updates_list.append(copy.deepcopy(client.updates))
+        local_updates_list.append(client.updates)
         if(ARGS.ALGORITHM=='FedNova'):
             tau_list.append(client.tau)
         elif(ARGS.ALGORITHM=='SCAFFOLD'):
