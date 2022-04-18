@@ -76,6 +76,8 @@ def average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list):
             
         if(ARGS.ALGORITHM == 'SCAFFOLD'): #https://github.com/Xtra-Computing/NIID-Bench
             # Update c_global
+            Server.model = Server.model.to('cpu')
+            
             total_delta = copy.deepcopy(Server.model.state_dict())
             for key in total_delta:
                 total_delta[key] = total_delta[key]*0.0
@@ -112,6 +114,7 @@ def send_client_updates_to_server_and_aggregate(Server,clients):
     Server, updates = average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list) 
     
     # Update global model
+    Server.model = Server.model.to('cpu')
     w=Server.model.state_dict()
     for key in w.keys():
       w[key] = w[key]-ARGS.SERVER_LR*updates[key]    # θt+1 ← θt - γgt
@@ -160,14 +163,19 @@ def send_server_model_to_clients(Server, clients):
 #TRAIN ALL CLIENTS
 def train_clients(clients):
     for i in range(len(clients)): 
+
+              
         #SET MODEL
         clients[i].net = clients[i].net.to(ARGS.DEVICE) # this will bring the network to GPU if DEVICE is cuda
         clients[i].net.train()
         cudnn.benchmark # Calling this optimizes runtime
-        if i == 0:
-            previous_model=copy.deepcopy(clients[0].net)  #save global model
-            previousW=previous_model.state_dict()  #save the weights     θ ← θt
         
+        if i == 0:
+              previous_model=copy.deepcopy(clients[0].net)  #save global model
+        
+        if(ARGS.ALGORITHM=='FedProx'):
+              previous_model = previous_model.to(ARGS.DEVICE)
+
         #SET LOADER AND EPOCH
         if(ARGS.FEDVC):
             if(len(clients[i].train_loader.dataset)>=ARGS.NVC):
@@ -217,14 +225,19 @@ def train_clients(clients):
                       net_para[key] = net_para[key] - ARGS.LR * (clients[i].c_global[key] - clients[i].c_local[key]) # c_global - c_local (variance reduction)
                   clients[i].net.load_state_dict(net_para)
 
-
+        clients[i].net = clients[i].net.to('cpu')
+        previous_model = previous_model.to('cpu')
         #CALCULATE UPDATE   Δθ ← θt - θ
+        previousW=previous_model.state_dict()  #save the weights     θ ← θt
         updates=clients[i].net.state_dict()
         for key in updates.keys():
           updates[key] = previousW[key] - updates[key]
         clients[i].updates=copy.deepcopy(updates)
         
         if(ARGS.ALGORITHM=='SCAFFOLD'):
+            for key in clients[i].c_global:
+                  clients[i].c_global[key] = clients[i].c_global[key].to('cpu')
+                  clients[i].c_local[key] = clients[i].c_local[key].to('cpu')
             # Update c_local and calculate delta
             c_new = copy.deepcopy(clients[i].c_local)
             for key in clients[i].c_local:
