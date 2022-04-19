@@ -257,6 +257,7 @@ def weighted_accuracy(clients):
   sum=0
   num_samples=0
   for i in range(len(clients)):
+    torch.cuda.empty_cache()
     loss, accuracy = evaluate(clients[i].net, clients[i].test_loader)
     sum=sum+accuracy*len(clients[i].train_loader.dataset)
     num_samples=num_samples+len(clients[i].train_loader.dataset)
