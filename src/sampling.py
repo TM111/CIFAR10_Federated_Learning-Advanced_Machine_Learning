@@ -184,8 +184,9 @@ def get_cached_clients():
 
             return clients_list
     else:
-        files = [f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
-        for f in files: os.remove(dir+f)
+        if(ARGS.COLAB==0):
+           files = [f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
+           for f in files: os.remove(dir+f)
         return None
     
     
