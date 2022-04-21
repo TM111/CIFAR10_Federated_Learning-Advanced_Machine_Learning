@@ -115,10 +115,17 @@ def send_client_updates_to_server_and_aggregate(Server,clients):
     
     # Update global model
     Server.model = Server.model.to('cpu')
+    '''
+    optimizer = torch.optim.SGD(Server.model.parameters(), lr=1, momentum=1, weight_decay=ARGS.WEIGHT_DECAY)
+    optimizer.zero_grad()
+    
+    optimizer.step()
+    '''
     w=Server.model.state_dict()
     for key in w.keys():
       w[key] = w[key]-ARGS.SERVER_LR*updates[key]    # θt+1 ← θt - γgt
     Server.model.load_state_dict(copy.deepcopy(w))
+
     return Server
 
 
@@ -163,6 +170,13 @@ def send_server_model_to_clients(Server, clients):
 #TRAIN ALL CLIENTS
 def train_clients(clients):
     for i in range(len(clients)): 
+        
+        if i == 0:
+              clients[i].net = clients[i].net.to('cpu')
+              previous_model=copy.deepcopy(clients[0].net)  #save global model
+              
+              if(ARGS.ALGORITHM=='FedProx'):
+                    previous_model = previous_model.to(ARGS.DEVICE)
 
               
         #SET MODEL
@@ -170,11 +184,7 @@ def train_clients(clients):
         clients[i].net.train()
         cudnn.benchmark # Calling this optimizes runtime
         
-        if i == 0:
-              previous_model=copy.deepcopy(clients[0].net)  #save global model
         
-        if(ARGS.ALGORITHM=='FedProx'):
-              previous_model = previous_model.to(ARGS.DEVICE)
 
         #SET LOADER AND EPOCH
         if(ARGS.FEDVC):
@@ -208,7 +218,7 @@ def train_clients(clients):
               outputs = clients[i].net(images)
               # Compute loss based on output and ground truth
               loss = clients[i].criterion(outputs, labels)
-              
+
               if(ARGS.ALGORITHM=='FedProx'): # https://epione.gitlabpages.inria.fr/flhd/federated_learning/FedAvg_FedProx_MNIST_iid_and_noniid.html
                   tensor_1=list(clients[i].net.parameters())
                   tensor_2=list(previous_model.parameters())
@@ -216,6 +226,7 @@ def train_clients(clients):
                   loss = loss + ARGS.MU/2*norm
                   
               # Compute gradients for each layer and update weights
+
               loss.backward()  # backward pass: computes gradients
               clients[i].optimizer.step() # update weights based on accumulated gradients
               
