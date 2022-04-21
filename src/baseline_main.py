@@ -19,15 +19,14 @@ if __name__ == '__main__':
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
         
-        ARGS.ALGORITHM='SCAFFOLD'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
+        ARGS.ALGORITHM='FedAvg'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
         
-        ARGS.DISTRIBUTION='dirichlet' # iid, non_iid, dirichlet, multimodal
+        ARGS.DISTRIBUTION='iid' # iid, non_iid, dirichlet, multimodal
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
-        ARGS.NUM_SELECTED_CLIENTS=10
+        ARGS.NUM_SELECTED_CLIENTS=30
     
-    
-
+    #ARGS.SERVER_MOMENTUM=0.01
     check_arguments() # control arguments
     
     train_set, test_set, train_loader, test_loader = get_dataset()  #download dataset
@@ -37,6 +36,7 @@ if __name__ == '__main__':
     if(Clients==None):
         train_loader_list=get_train_distribution(train_set) #split trainset to current distribution
         Clients=get_clients_list(train_loader_list, train_set, test_set) #generate client list
+    
     
     for i in range(random.randint(2,7)):
       random.shuffle(Clients)
@@ -90,7 +90,7 @@ if __name__ == '__main__':
       Server = send_client_updates_to_server_and_aggregate(Server, selected_clients)
     
       #DEBUG: print size,sum_weights,sum_updates for each client
-      debug=0
+      debug=1
       if(debug): print_weights(selected_clients, Server.model)
     
       #SERVER MODEL -> CLIENTS
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     
       #TEST
       seconds=str(round(float(time.time() - start_time),2))
-      server_loss, server_accuracy = evaluate(Server.model, test_loader)
+      server_loss, server_accuracy = evaluate(Server.model, test_loader,0)
       w_accuracy=weighted_accuracy(clients)
       print(f'After round {i+1:2d} \t server accuracy: {server_accuracy:.3f} \t server loss: {server_loss:.3f} \t weighted accuracy: {w_accuracy:.3f} \t train time: {seconds} sec.')
     

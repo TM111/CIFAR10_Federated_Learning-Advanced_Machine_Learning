@@ -219,7 +219,7 @@ def get_net_and_optimizer():
 def evaluate(net, dataloader):
       criterion = nn.CrossEntropyLoss()
       with torch.no_grad():
-        net = net.to(ARGS.DEVICE) # this will bring the network to GPU if DEVICE is cuda
+        net.to(ARGS.DEVICE) # this will bring the network to GPU if DEVICE is cuda
         net.train(False) # Set Network to evaluation mode
         running_corrects = 0
         #iterable = tqdm(dataloader) if print_tqdm else dataloader
@@ -235,6 +235,8 @@ def evaluate(net, dataloader):
           _, preds = torch.max(outputs.data, 1)
           # Update Corrects
           running_corrects = running_corrects + torch.sum(preds == labels.data).data.item()
+          
         # Calculate Accuracy
         accuracy = running_corrects / float(len(dataloader.dataset))
+        net.cpu()
       return mean(losses),accuracy

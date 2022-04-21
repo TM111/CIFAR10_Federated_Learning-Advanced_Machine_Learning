@@ -169,21 +169,24 @@ def send_server_model_to_clients(Server, clients):
 
 #TRAIN ALL CLIENTS
 def train_clients(clients):
+    
     for i in range(len(clients)): 
-        
-        if i == 0:
-              clients[i].net = clients[i].net.to('cpu')
+        if (i==0):
+              clients[i].net = clients[i].net.cpu()
               previous_model=copy.deepcopy(clients[0].net)  #save global model
               
               if(ARGS.ALGORITHM=='FedProx'):
                     previous_model = previous_model.to(ARGS.DEVICE)
-
+        
+        if(ARGS.ALGORITHM=='SCAFFOLD'):
+            for key in clients[i].c_global:
+                  clients[i].c_global[key] = clients[i].c_global[key].to(ARGS.DEVICE)
+                  clients[i].c_local[key] = clients[i].c_local[key].to(ARGS.DEVICE)
               
         #SET MODEL
-        clients[i].net = clients[i].net.to(ARGS.DEVICE) # this will bring the network to GPU if DEVICE is cuda
+        clients[i].net.to(ARGS.DEVICE) # this will bring the network to GPU if DEVICE is cuda
         clients[i].net.train()
         cudnn.benchmark # Calling this optimizes runtime
-        
         
 
         #SET LOADER AND EPOCH
@@ -198,19 +201,13 @@ def train_clients(clients):
         else:
             loader=clients[i].train_loader
             epochs=clients[i].local_epochs
-        
-        if(ARGS.ALGORITHM=='SCAFFOLD'):
-            for key in clients[i].c_global:
-                clients[i].c_global[key] = clients[i].c_global[key].to(ARGS.DEVICE)
-                clients[i].c_local[key] = clients[i].c_local[key].to(ARGS.DEVICE)
-                
+
         #START TRAIN
         for epoch in range(epochs):    
             for images, labels in loader:
               # Bring data over the device of choice
               images = images.to(ARGS.DEVICE)
               labels = labels.to(ARGS.DEVICE)
-
               clients[i].net.train() # Sets module in training mode
 
               clients[i].optimizer.zero_grad() # Zero-ing the gradients
@@ -229,26 +226,25 @@ def train_clients(clients):
 
               loss.backward()  # backward pass: computes gradients
               clients[i].optimizer.step() # update weights based on accumulated gradients
-              
+
               if(ARGS.ALGORITHM=='SCAFFOLD'):
                   net_para = clients[i].net.state_dict()
                   for key in net_para:
                       net_para[key] = net_para[key] - ARGS.LR * (clients[i].c_global[key] - clients[i].c_local[key]) # c_global - c_local (variance reduction)
                   clients[i].net.load_state_dict(net_para)
 
-        clients[i].net = clients[i].net.to('cpu')
-        previous_model = previous_model.to('cpu')
+        clients[i].net.cpu()
+        previous_model.cpu()
         #CALCULATE UPDATE   Δθ ← θt - θ
         previousW=previous_model.state_dict()  #save the weights     θ ← θt
         updates=clients[i].net.state_dict()
         for key in updates.keys():
           updates[key] = previousW[key] - updates[key]
         clients[i].updates=copy.deepcopy(updates)
-        
         if(ARGS.ALGORITHM=='SCAFFOLD'):
             for key in clients[i].c_global:
-                  clients[i].c_global[key] = clients[i].c_global[key].to('cpu')
-                  clients[i].c_local[key] = clients[i].c_local[key].to('cpu')
+                  clients[i].c_global[key] = clients[i].c_global[key].cpu()
+                  clients[i].c_local[key] = clients[i].c_local[key].cpu()
             # Update c_local and calculate delta
             c_new = copy.deepcopy(clients[i].c_local)
             for key in clients[i].c_local:
@@ -260,7 +256,6 @@ def train_clients(clients):
 
 
 
-
 #WEIGHTED ACCURACY
 def weighted_accuracy(clients):
   if(ARGS.CENTRALIZED_MODE):
@@ -268,7 +263,6 @@ def weighted_accuracy(clients):
   sum=0
   num_samples=0
   for i in range(len(clients)):
-    torch.cuda.empty_cache()
     loss, accuracy = evaluate(clients[i].net, clients[i].test_loader)
     sum=sum+accuracy*len(clients[i].train_loader.dataset)
     num_samples=num_samples+len(clients[i].train_loader.dataset)
