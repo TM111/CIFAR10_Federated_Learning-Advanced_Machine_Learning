@@ -90,7 +90,7 @@ if __name__ == '__main__':
       Server = send_client_updates_to_server_and_aggregate(Server, selected_clients)
     
       #DEBUG: print size,sum_weights,sum_updates for each client
-      debug=1
+      debug=0
       if(debug): print_weights(selected_clients, Server.model)
     
       #SERVER MODEL -> CLIENTS
