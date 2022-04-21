@@ -175,8 +175,8 @@ def train_clients(clients):
               clients[i].net = clients[i].net.cpu()
               previous_model=copy.deepcopy(clients[0].net)  #save global model
               
-              if(ARGS.ALGORITHM=='FedProx'):
-                    previous_model = previous_model.to(ARGS.DEVICE)
+        if(ARGS.ALGORITHM=='FedProx'):
+              previous_model = previous_model.to(ARGS.DEVICE)
         
         if(ARGS.ALGORITHM=='SCAFFOLD'):
             for key in clients[i].c_global:
