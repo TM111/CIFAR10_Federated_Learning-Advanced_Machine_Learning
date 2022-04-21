@@ -24,7 +24,7 @@ if __name__ == '__main__':
         ARGS.DISTRIBUTION='iid' # iid, non_iid, dirichlet, multimodal
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
-        ARGS.NUM_SELECTED_CLIENTS=30
+        ARGS.NUM_SELECTED_CLIENTS=2
     
     #ARGS.SERVER_MOMENTUM=0.01
     check_arguments() # control arguments
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     
       #TEST
       seconds=str(round(float(time.time() - start_time),2))
-      server_loss, server_accuracy = evaluate(Server.model, test_loader,0)
+      server_loss, server_accuracy = evaluate(Server.model, test_loader)
       w_accuracy=weighted_accuracy(clients)
       print(f'After round {i+1:2d} \t server accuracy: {server_accuracy:.3f} \t server loss: {server_loss:.3f} \t weighted accuracy: {w_accuracy:.3f} \t train time: {seconds} sec.')
     
