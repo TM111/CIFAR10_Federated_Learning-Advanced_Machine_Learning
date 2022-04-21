@@ -112,10 +112,10 @@ def send_client_updates_to_server_and_aggregate(Server,clients):
             
     # Aggregate
     Server, updates = average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list) 
-    
+    '''
     # Update global model
     Server.model = Server.model.to('cpu')
-    '''
+
     optimizer = torch.optim.SGD(Server.model.parameters(), lr=1, momentum=1, weight_decay=ARGS.WEIGHT_DECAY)
     optimizer.zero_grad()
     
