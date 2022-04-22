@@ -8,7 +8,7 @@ class Server():
     def __init__(self):
         self.model, _ = get_net_and_optimizer()
         
-        self.optimizer=torch.optim.SGD(self.model.parameters(), lr=1, momentum=ARGS.SERVER_MOMENTUM, weight_decay=ARGS.WEIGHT_DECAY)
+        self.optimizer=torch.optim.SGD(self.model.parameters(), lr=1, momentum=ARGS.SERVER_MOMENTUM)
         
         if(ARGS.ALGORITHM=='SCAFFOLD'):
             self.c_global=copy.deepcopy(self.model.state_dict()) # server control variates (SCAFFOLD)

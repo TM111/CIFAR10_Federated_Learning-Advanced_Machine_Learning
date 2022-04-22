@@ -238,5 +238,5 @@ def evaluate(net, dataloader):
           
         # Calculate Accuracy
         accuracy = running_corrects / float(len(dataloader.dataset))
-        net.cpu()
+        #net.cpu()
       return mean(losses),accuracy

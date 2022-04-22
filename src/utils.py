@@ -71,7 +71,7 @@ def average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list):
 
         if(ARGS.ALGORITHM == 'SCAFFOLD'): #https://github.com/Xtra-Computing/NIID-Bench
             # Update c_global
-            Server.model = Server.model.to('cpu')
+            Server.model.cpu()
             
             total_delta = copy.deepcopy(Server.model.state_dict())
             for key in total_delta:
@@ -84,7 +84,7 @@ def average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list):
             for key in Server.c_global:
                 Server.c_global[key] = Server.c_global[key] + total_delta[key] / len(c_delta_list)
             
-    return updates_avg
+    return Server, updates_avg
 
 
 
@@ -104,9 +104,11 @@ def send_client_updates_to_server_and_aggregate(Server,clients):
         elif(ARGS.ALGORITHM=='SCAFFOLD'):
             c_delta_list.append(client.c_delta)
     # Aggregate
-    updates = average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list) 
+    Server, updates = average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list) 
+
     # Update global model
-    Server.model = Server.model.to('cpu')
+    Server.model.cpu()
+
     for name, w in Server.model.named_parameters():
         w.grad=updates[name]
     Server.optimizer.step()
