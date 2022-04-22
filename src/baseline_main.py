@@ -94,8 +94,6 @@ if __name__ == '__main__':
       debug=0
       if(debug): print_weights(selected_clients, Server.model)
     
-      print(selected_clients[0].net.state_dict()['conv2.1.running_mean'])
-      print(Server.model.state_dict()['conv2.1.running_mean'])
       #SERVER MODEL -> CLIENTS
       Clients = send_server_model_to_clients(Server, Clients)
     
