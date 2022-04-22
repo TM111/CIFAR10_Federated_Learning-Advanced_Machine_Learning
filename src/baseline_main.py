@@ -12,18 +12,18 @@ if __name__ == '__main__':
     if(ARGS.COLAB == 0): #test locally
     
         ARGS.DEVICE='cpu'
-        ARGS.MODEL='LeNet5' # LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, 
+        ARGS.MODEL='CNNNet' # LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, 
         ARGS.NUM_EPOCHS=2                     # mobilenet_v3_small, resnet18, densenet121, googlenet 
         ARGS.BATCH_NORM=1
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
         
-        ARGS.ALGORITHM='SCAFFOLD'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
+        ARGS.ALGORITHM='FedAvg'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
         
-        ARGS.DISTRIBUTION='non_iid' # iid, non_iid, dirichlet, multimodal
+        ARGS.DISTRIBUTION='iid' # iid, non_iid, dirichlet, multimodal
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
-        ARGS.NUM_SELECTED_CLIENTS=2
+        ARGS.NUM_SELECTED_CLIENTS=1
 
 
     #ARGS.SERVER_MOMENTUM=0.01
@@ -73,7 +73,6 @@ if __name__ == '__main__':
     
     #INSTANCE SERVER
     Server = Server()
-    Server.model = Server.model.to(ARGS.DEVICE)
     
     #SERVER MODEL -> CLIENTS
     send_server_model_to_clients(Server, Clients)
@@ -93,7 +92,7 @@ if __name__ == '__main__':
       Server = send_client_updates_to_server_and_aggregate(Server, selected_clients)
     
       #DEBUG: print size,sum_weights,sum_updates for each client
-      debug=0
+      debug=1
       if(debug): print_weights(selected_clients, Server.model)
     
       #SERVER MODEL -> CLIENTS

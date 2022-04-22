@@ -91,7 +91,6 @@ def average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list):
 
 #CLIENTS UPDATES -> SERVER & AVERAGE
 def send_client_updates_to_server_and_aggregate(Server,clients):
-    
     # Information to be sent to server
     n_list=[]                   # size of local dataset
     local_updates_list=[]
@@ -108,8 +107,8 @@ def send_client_updates_to_server_and_aggregate(Server,clients):
     updates = average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list) 
     # Update global model
     Server.model = Server.model.to('cpu')
-    for name, we in Server.model.named_parameters():
-        we.grad=updates[name]
+    for name, w in Server.model.named_parameters():
+        w.grad=updates[name]
     Server.optimizer.step()
     return Server
 
