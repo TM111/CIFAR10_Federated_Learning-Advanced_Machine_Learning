@@ -69,6 +69,12 @@ def average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list):
                     updates_avg[key] = updates_avg[key] + local_updates_list[i][key]*n_list[i]
                 updates_avg[key] = torch.div(updates_avg[key], total_n)
 
+        if(ARGS.ALGORITHM=='FedAvgM'):
+            if(Server.previous_updates is not None):
+                for key in updates_avg.keys():
+                    updates_avg[key]=ARGS.SERVER_MOMENTUM*Server.previous_updates_avg[key]+updates_avg[key]
+            Server.previous_updates=copy.deepcopy(updates_avg)
+                        
         if(ARGS.ALGORITHM == 'SCAFFOLD'): #https://github.com/Xtra-Computing/NIID-Bench
             # Update c_global
             Server.model.cpu()
@@ -109,9 +115,11 @@ def send_client_updates_to_server_and_aggregate(Server,clients):
     # Update global model
     Server.model.cpu()
 
-    for name, w in Server.model.named_parameters():
-        w.grad=updates[name]
-    Server.optimizer.step()
+    w=Server.model.state_dict()
+    for key in w.keys():
+        w[key] = w[key]-ARGS.SERVER_LR*updates[key]    # θt+1 ← θt - γgt
+    Server.model.load_state_dict(copy.deepcopy(w))
+    
     return Server
 
 
@@ -123,6 +131,7 @@ def print_weights(clients,server_model):   # test to view if the algotihm is cor
       w.append(c.net.state_dict())
     w_avg=server_model.state_dict()
     print("")
+
     for key in w[0].keys():
         if('bias' in key or 'weight' in key):
             node=key

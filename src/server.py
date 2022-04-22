@@ -10,6 +10,7 @@ class Server():
         
         self.optimizer=torch.optim.SGD(self.model.parameters(), lr=1, momentum=ARGS.SERVER_MOMENTUM)
         
+        self.previous_updates=None
         if(ARGS.ALGORITHM=='SCAFFOLD'):
             self.c_global=copy.deepcopy(self.model.state_dict()) # server control variates (SCAFFOLD)
             for key in self.c_global: 

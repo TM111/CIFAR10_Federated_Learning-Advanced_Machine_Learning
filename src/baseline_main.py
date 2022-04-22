@@ -12,13 +12,13 @@ if __name__ == '__main__':
     if(ARGS.COLAB == 0): #test locally
     
         ARGS.DEVICE='cpu'
-        ARGS.MODEL='LeNet5' # LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, 
+        ARGS.MODEL='CNNNet' # LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, 
         ARGS.NUM_EPOCHS=2                     # mobilenet_v3_small, resnet18, densenet121, googlenet 
-        ARGS.BATCH_NORM=1
+        ARGS.BATCH_NORM=0
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
         
-        ARGS.ALGORITHM='FedAvg'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
+        ARGS.ALGORITHM='FedAvgM'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
         
         ARGS.DISTRIBUTION='dirichlet' # iid, non_iid, dirichlet, multimodal
         ARGS.ALPHA=100
@@ -84,7 +84,6 @@ if __name__ == '__main__':
       #SELECT CLEINTS
       selected_clients = select_clients(Clients)
       
-
       #TRAIN CLIENTS
       selected_clients = train_clients(selected_clients)
       
@@ -92,9 +91,11 @@ if __name__ == '__main__':
       Server = send_client_updates_to_server_and_aggregate(Server, selected_clients)
     
       #DEBUG: print size,sum_weights,sum_updates for each client
-      debug=1
+      debug=0
       if(debug): print_weights(selected_clients, Server.model)
     
+      print(selected_clients[0].net.state_dict()['conv2.1.running_mean'])
+      print(Server.model.state_dict()['conv2.1.running_mean'])
       #SERVER MODEL -> CLIENTS
       Clients = send_server_model_to_clients(Server, Clients)
     
