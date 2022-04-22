@@ -147,6 +147,9 @@ def check_arguments():
     if(ARGS.ALGORITHM == 'FedSGD'): 
         ARGS.NUM_EPOCHS=1
         ARGS.BATCH_SIZE=10000
+    
+    if(ARGS.ALGORITHM != 'FedAvgM'): 
+        ARGS.SERVER_MOMENTUM=0
         
     if(ARGS.ALGORITHM in ['FedProx', 'FedNova', 'SCAFFOLD']):
         ARGS.FEDIR=0
