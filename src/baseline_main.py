@@ -78,14 +78,6 @@ if __name__ == '__main__':
     print("Number of selected clients:",ARGS.NUM_SELECTED_CLIENTS)
     print("Number of rounds:",ARGS.ROUNDS)
 
-    print("Distribution of trainset for client "+str(ind),get_dataset_distribution(clients[ind].train_loader.dataset),'size: '+str(len(clients[ind].train_loader.dataset)))
-    print("Distribution of testset for client "+str(ind),get_dataset_distribution(clients[ind].test_loader.dataset),'size: '+str(len(clients[ind].test_loader.dataset)))
-    train_clients(clients)
-    print("Model: "+str(ARGS.MODEL))
-    print("Dataset distribution: "+str(ARGS.DISTRIBUTION)+"  "+str(ARGS.ALPHA)+" ("+str(ARGS.NUM_CLASS_RANGE[0])+','+str(ARGS.NUM_CLASS_RANGE[1])+')')
-    print("Number of clients: "+str(ARGS.NUM_CLIENTS))
-    print("Number of selected clients: "+str(ARGS.NUM_SELECTED_CLIENTS))
-    print("Number of rounds: "+str(ARGS.ROUNDS))
 
     print("-----------------------------------------")
     
@@ -111,7 +103,7 @@ if __name__ == '__main__':
       send_client_updates_to_server_and_aggregate(Server, selected_clients)
     
       #DEBUG: print size,sum_weights,sum_updates for each client
-      debug=1
+      debug=0
       if(debug): print_weights(selected_clients, Server.model)
     
       #SERVER MODEL -> CLIENTS
