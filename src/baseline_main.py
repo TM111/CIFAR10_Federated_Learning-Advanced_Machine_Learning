@@ -12,20 +12,20 @@ if __name__ == '__main__':
     if(ARGS.COLAB == 0): #test locally
     
         ARGS.DEVICE='cpu'
-        
         ARGS.MODEL='LeNet5' # LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, 
         ARGS.NUM_EPOCHS=2                     # mobilenet_v3_small, resnet18, densenet121, googlenet 
         ARGS.BATCH_NORM=1
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
         
-        ARGS.ALGORITHM='FedAvg'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
+        ARGS.ALGORITHM='SCAFFOLD'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
         
-        ARGS.DISTRIBUTION='iid' # iid, non_iid, dirichlet, multimodal
+        ARGS.DISTRIBUTION='non_iid' # iid, non_iid, dirichlet, multimodal
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
         ARGS.NUM_SELECTED_CLIENTS=2
-    
+
+
     #ARGS.SERVER_MOMENTUM=0.01
     check_arguments() # control arguments
     
@@ -38,9 +38,18 @@ if __name__ == '__main__':
         Clients=get_clients_list(train_loader_list, train_set, test_set) #generate client list
     
     
+        
+    clients=get_cached_clients() #get cached clients list
+    clients=None
+    if(clients==None):
+        train_loader_list=get_train_distribution(train_set) #split trainset to current distribution
+        clients=get_clients_list(train_loader_list, train_set, test_set) #generate client list
+
+
     for i in range(random.randint(2,7)):
       random.shuffle(Clients)
     ind=0
+    
     print("Distribution of trainset for client "+str(ind),get_dataset_distribution(Clients[ind].train_loader.dataset),'size: '+str(len(Clients[ind].train_loader.dataset)))
             
     print("-----------------------------------------")
@@ -68,6 +77,16 @@ if __name__ == '__main__':
     print("Number of clients:",ARGS.NUM_CLIENTS)
     print("Number of selected clients:",ARGS.NUM_SELECTED_CLIENTS)
     print("Number of rounds:",ARGS.ROUNDS)
+
+    print("Distribution of trainset for client "+str(ind),get_dataset_distribution(clients[ind].train_loader.dataset),'size: '+str(len(clients[ind].train_loader.dataset)))
+    print("Distribution of testset for client "+str(ind),get_dataset_distribution(clients[ind].test_loader.dataset),'size: '+str(len(clients[ind].test_loader.dataset)))
+    train_clients(clients)
+    print("Model: "+str(ARGS.MODEL))
+    print("Dataset distribution: "+str(ARGS.DISTRIBUTION)+"  "+str(ARGS.ALPHA)+" ("+str(ARGS.NUM_CLASS_RANGE[0])+','+str(ARGS.NUM_CLASS_RANGE[1])+')')
+    print("Number of clients: "+str(ARGS.NUM_CLIENTS))
+    print("Number of selected clients: "+str(ARGS.NUM_SELECTED_CLIENTS))
+    print("Number of rounds: "+str(ARGS.ROUNDS))
+
     print("-----------------------------------------")
     
     #INSTANCE SERVER
@@ -75,31 +94,33 @@ if __name__ == '__main__':
     Server.model = Server.model.to(ARGS.DEVICE)
     
     #SERVER MODEL -> CLIENTS
-    Clients=send_server_model_to_clients(Server, Clients)
+    send_server_model_to_clients(Server, Clients)
     
+
     for i in range(ARGS.ROUNDS):
       start_time = time.time()
     
       #SELECT CLEINTS
-      selected_clients=select_clients(Clients)
+      selected_clients = select_clients(Clients)
       
+
       #TRAIN CLIENTS
-      selected_clients=train_clients(selected_clients)
+      train_clients(selected_clients)
       
       #CLIENTS UPDATES -> SERVER & AVERAGE
-      Server = send_client_updates_to_server_and_aggregate(Server, selected_clients)
+      send_client_updates_to_server_and_aggregate(Server, selected_clients)
     
       #DEBUG: print size,sum_weights,sum_updates for each client
-      debug=0
+      debug=1
       if(debug): print_weights(selected_clients, Server.model)
     
       #SERVER MODEL -> CLIENTS
-      clients=send_server_model_to_clients(Server, Clients)
+      send_server_model_to_clients(Server, Clients)
     
       #TEST
       seconds=str(round(float(time.time() - start_time),2))
       server_loss, server_accuracy = evaluate(Server.model, test_loader)
-      w_accuracy=weighted_accuracy(clients)
+      w_accuracy=weighted_accuracy(Clients)
       print(f'After round {i+1:2d} \t server accuracy: {server_accuracy:.3f} \t server loss: {server_loss:.3f} \t weighted accuracy: {w_accuracy:.3f} \t train time: {seconds} sec.')
     
     print("-----------------------------------------")
