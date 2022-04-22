@@ -72,7 +72,7 @@ def average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list):
         if(ARGS.ALGORITHM=='FedAvgM'):
             if(Server.previous_updates is not None):
                 for key in updates_avg.keys():
-                    updates_avg[key]=ARGS.SERVER_MOMENTUM*Server.previous_updates_avg[key]+updates_avg[key]
+                    updates_avg[key]=ARGS.SERVER_MOMENTUM*Server.previous_updates[key]+updates_avg[key]
             Server.previous_updates=copy.deepcopy(updates_avg)
                         
         if(ARGS.ALGORITHM == 'SCAFFOLD'): #https://github.com/Xtra-Computing/NIID-Bench
