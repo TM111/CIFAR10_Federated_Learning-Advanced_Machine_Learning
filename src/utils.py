@@ -5,8 +5,9 @@ import torch
 import copy
 import random
 import torch.backends.cudnn as cudnn
-from models import evaluate
+from models import evaluate,get_net_and_optimizer
 from options import ARGS
+import torch.nn as nn
 
 
 def get_dataset():
@@ -67,13 +68,7 @@ def average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list):
                 for i in range(len(local_updates_list)):
                     updates_avg[key] = updates_avg[key] + local_updates_list[i][key]*n_list[i]
                 updates_avg[key] = torch.div(updates_avg[key], total_n)
-                
-        if(ARGS.ALGORITHM == 'FedAvgM'):
-            if(Server.previous_updates is not None):
-                for key in updates_avg.keys():
-                    updates_avg[key] = ARGS.SERVER_MOMENTUM * Server.previous_updates[key] + updates_avg[key]
-            Server.previous_updates = copy.deepcopy(updates_avg)
-            
+
         if(ARGS.ALGORITHM == 'SCAFFOLD'): #https://github.com/Xtra-Computing/NIID-Bench
             # Update c_global
             Server.model = Server.model.to('cpu')
@@ -89,7 +84,7 @@ def average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list):
             for key in Server.c_global:
                 Server.c_global[key] = Server.c_global[key] + total_delta[key] / len(c_delta_list)
             
-    return Server, updates_avg
+    return updates_avg
 
 
 
@@ -109,26 +104,13 @@ def send_client_updates_to_server_and_aggregate(Server,clients):
             tau_list.append(client.tau)
         elif(ARGS.ALGORITHM=='SCAFFOLD'):
             c_delta_list.append(client.c_delta)
-            
     # Aggregate
-    Server, updates = average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list) 
-
+    updates = average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list) 
     # Update global model
-    Server.model = Server.model.cpu()
-    '''
-    optimizer = torch.optim.SGD(Server.model.parameters(), lr=1, momentum=1, weight_decay=ARGS.WEIGHT_DECAY)
-    optimizer.zero_grad()
-    
-    optimizer.step()
-    '''
-    w=Server.model.state_dict()
-    for key in w.keys():
-      w[key] = w[key]-ARGS.SERVER_LR*updates[key]    # θt+1 ← θt - γgt
-    Server.model.load_state_dict(copy.deepcopy(w))
-
-    return Server
-
-
+    Server.model = Server.model.to('cpu')
+    for name, we in Server.model.named_parameters():
+        we.grad=updates[name]
+    Server.optimizer.step()
 
 
 
@@ -143,16 +125,20 @@ def print_weights(clients,server_model):   # test to view if the algotihm is cor
         if('bias' in key or 'weight' in key):
             node=key
             break
+    total_s=0.0
+    numeratore=0.0
     for i in range(len(clients)):
+        
       s=str(i+1)+')'+'S:'+str(len(clients[i].train_loader.dataset))
       we=str(round(torch.sum(w[i][node]).tolist(),3))
       u=str(round(torch.sum(clients[i].updates[node]).tolist(),3))
       s=s+' W:'+we+' U:'+u+' '
       print(s)
+      
+      total_s+=len(clients[i].train_loader.dataset)
+      numeratore+=torch.sum(w[i][node]).tolist()*len(clients[i].train_loader.dataset)
     print('avg '+str(round(torch.sum(w_avg[node]).tolist(),4)))
-
-
-
+    print('cor',round(numeratore/total_s,4))
 
 
 #SERVER MODEL -> CLIENTS
@@ -241,6 +227,7 @@ def train_clients(clients):
         for key in updates.keys():
           updates[key] = previousW[key] - updates[key]
         clients[i].updates=copy.deepcopy(updates)
+
         if(ARGS.ALGORITHM=='SCAFFOLD'):
             for key in clients[i].c_global:
                   clients[i].c_global[key] = clients[i].c_global[key].cpu()
@@ -251,6 +238,7 @@ def train_clients(clients):
                 c_new[key] = c_new[key] - clients[i].c_global[key] + updates[key] / (clients[i].tau * ARGS.LR)
                 clients[i].c_delta[key] = c_new[key] - clients[i].c_local[key]
             clients[i].c_local = c_new
+
     return clients
 
 
