@@ -121,7 +121,7 @@ def print_weights(clients,server_model):   # test to view if the algotihm is cor
       w.append(c.net.state_dict())
     w_avg=server_model.state_dict()
     print("")
-    for key in clients[0].updates.keys():
+    for key in w[0].keys():
         if('bias' in key or 'weight' in key):
             node=key
             break
