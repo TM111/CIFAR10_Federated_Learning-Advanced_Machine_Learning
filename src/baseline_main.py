@@ -97,7 +97,7 @@ if __name__ == '__main__':
       if(debug): print_weights(selected_clients, Server.model)
     
       #SERVER MODEL -> CLIENTS
-      send_server_model_to_clients(Server, Clients)
+      Clients = send_server_model_to_clients(Server, Clients)
     
       #TEST
       seconds=str(round(float(time.time() - start_time),2))
