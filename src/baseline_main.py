@@ -87,10 +87,10 @@ if __name__ == '__main__':
       
 
       #TRAIN CLIENTS
-      train_clients(selected_clients)
+      selected_clients = train_clients(selected_clients)
       
       #CLIENTS UPDATES -> SERVER & AVERAGE
-      send_client_updates_to_server_and_aggregate(Server, selected_clients)
+      Server = send_client_updates_to_server_and_aggregate(Server, selected_clients)
     
       #DEBUG: print size,sum_weights,sum_updates for each client
       debug=0

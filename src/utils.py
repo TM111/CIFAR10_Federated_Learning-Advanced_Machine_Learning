@@ -111,6 +111,7 @@ def send_client_updates_to_server_and_aggregate(Server,clients):
     for name, we in Server.model.named_parameters():
         we.grad=updates[name]
     Server.optimizer.step()
+    return Server
 
 
 
@@ -148,14 +149,12 @@ def send_server_model_to_clients(Server, clients):
       clients[i].net.load_state_dict(copy.deepcopy(w)) # send global model to clients
       if(ARGS.ALGORITHM=='SCAFFOLD'): # send c_global to clients
           clients[i].c_global=Server.c_global
-          
     return clients
 
 
 
 #TRAIN ALL CLIENTS
 def train_clients(clients):
-    
     for i in range(len(clients)): 
         if (i==0):
               clients[i].net = clients[i].net.cpu()
@@ -238,7 +237,6 @@ def train_clients(clients):
                 c_new[key] = c_new[key] - clients[i].c_global[key] + updates[key] / (clients[i].tau * ARGS.LR)
                 clients[i].c_delta[key] = c_new[key] - clients[i].c_local[key]
             clients[i].c_local = c_new
-
     return clients
 
 
@@ -259,7 +257,6 @@ def weighted_accuracy(clients):
 
 #SELECT CLIENTS
 def select_clients(clients):
-    
   if(ARGS.FEDVC): #select clients with probabilities
       indexes_range=list(range(len(clients)))
       W=[len(clients[i].train_loader.dataset) for i in indexes_range]
