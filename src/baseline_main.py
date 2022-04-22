@@ -37,19 +37,10 @@ if __name__ == '__main__':
         train_loader_list=get_train_distribution(train_set) #split trainset to current distribution
         Clients=get_clients_list(train_loader_list, train_set, test_set) #generate client list
     
-    
-        
-    clients=get_cached_clients() #get cached clients list
-    clients=None
-    if(clients==None):
-        train_loader_list=get_train_distribution(train_set) #split trainset to current distribution
-        clients=get_clients_list(train_loader_list, train_set, test_set) #generate client list
-
 
     for i in range(random.randint(2,7)):
       random.shuffle(Clients)
     ind=0
-    
     print("Distribution of trainset for client "+str(ind),get_dataset_distribution(Clients[ind].train_loader.dataset),'size: '+str(len(Clients[ind].train_loader.dataset)))
             
     print("-----------------------------------------")
@@ -77,7 +68,6 @@ if __name__ == '__main__':
     print("Number of clients:",ARGS.NUM_CLIENTS)
     print("Number of selected clients:",ARGS.NUM_SELECTED_CLIENTS)
     print("Number of rounds:",ARGS.ROUNDS)
-
 
     print("-----------------------------------------")
     
