@@ -69,7 +69,7 @@ def average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list):
                     updates_avg[key] = updates_avg[key] + local_updates_list[i][key]*n_list[i]
                 updates_avg[key] = torch.div(updates_avg[key], total_n)
 
-        if(ARGS.ALGORITHM=='FedAvgM'):
+        if(ARGS.ALGORITHM=='FedAvgM' and ARGS.COUNT>=0):
             if(Server.previous_updates is not None):
                 for key in updates_avg.keys():
                     updates_avg[key]=ARGS.SERVER_MOMENTUM*Server.previous_updates[key]+updates_avg[key]
@@ -114,11 +114,16 @@ def send_client_updates_to_server_and_aggregate(Server,clients):
 
     # Update global model
     Server.model.cpu()
-
-    w=Server.model.state_dict()
-    for key in w.keys():
-        w[key] = w[key]-ARGS.SERVER_LR*updates[key]    # θt+1 ← θt - γgt
-    Server.model.load_state_dict(copy.deepcopy(w))
+    
+    if(ARGS.COUNT>=0):
+        w=Server.model.state_dict()
+        for key in w.keys():
+            w[key] = w[key]-ARGS.SERVER_LR*updates[key]    # θt+1 ← θt - γgt
+        Server.model.load_state_dict(copy.deepcopy(w))
+    else:
+        for name, w in Server.model.named_parameters():
+            w.grad=updates[name]
+        Server.optimizer.step()
     
     return Server
 
