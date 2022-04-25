@@ -8,7 +8,7 @@ class Server():
     def __init__(self):
         self.model, _ = get_net_and_optimizer()
         
-        self.optimizer=torch.optim.SGD(self.model.parameters(), lr=1, momentum=ARGS.SERVER_MOMENTUM)
+        self.optimizer=torch.optim.SGD(self.model.parameters(), lr=ARGS.SERVER_LR, momentum=ARGS.SERVER_MOMENTUM)
         
         self.previous_updates=None
         

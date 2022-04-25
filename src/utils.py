@@ -72,7 +72,9 @@ def average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list):
         if(ARGS.ALGORITHM=='FedAvgM' and ARGS.COUNT>=0):
             if(Server.previous_updates is not None):
                 for key in updates_avg.keys():
-                    updates_avg[key]=ARGS.SERVER_MOMENTUM*Server.previous_updates[key]+updates_avg[key]
+                  if('running' not in str(key)):
+                      if('batches' not in str(key)):
+                        updates_avg[key]=ARGS.SERVER_MOMENTUM*Server.previous_updates[key]+updates_avg[key]
             Server.previous_updates=copy.deepcopy(updates_avg)
                         
         if(ARGS.ALGORITHM == 'SCAFFOLD'): #https://github.com/Xtra-Computing/NIID-Bench
@@ -166,8 +168,6 @@ def send_server_model_to_clients(Server, clients):
           clients[i].c_global=Server.c_global
     return clients
 
-
-
 #TRAIN ALL CLIENTS
 def train_clients(clients):
     for i in range(len(clients)): 
@@ -230,7 +230,9 @@ def train_clients(clients):
               if(ARGS.ALGORITHM=='SCAFFOLD'):
                   net_para = clients[i].net.state_dict()
                   for key in net_para:
-                      net_para[key] = net_para[key] - ARGS.LR * (clients[i].c_global[key] - clients[i].c_local[key]) # c_global - c_local (variance reduction)
+                    if('running' not in str(key)):
+                      if('batches' not in str(key)):
+                        net_para[key] = net_para[key] - ARGS.LR * (clients[i].c_global[key] - clients[i].c_local[key]) # c_global - c_local (variance reduction)
                   clients[i].net.load_state_dict(net_para)
 
         clients[i].net.cpu()

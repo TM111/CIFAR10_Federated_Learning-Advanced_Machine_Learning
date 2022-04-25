@@ -14,21 +14,21 @@ if __name__ == '__main__':
         ARGS.DEVICE='cpu'
         ARGS.MODEL='LeNet5' # LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, 
         ARGS.NUM_EPOCHS=2                     # mobilenet_v3_small, resnet18, densenet121, googlenet 
-        ARGS.BATCH_NORM=0
+        ARGS.BATCH_NORM=1
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
         
         ARGS.ALGORITHM='FedAvg'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
         
         ARGS.DISTRIBUTION='dirichlet' # iid, non_iid, dirichlet, multimodal
-        ARGS.ALPHA=0
+        ARGS.ALPHA=0.2
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
         ARGS.NUM_SELECTED_CLIENTS=3
 
     
     #ARGS.LR=0.005
-    #ARGS.COUNT=4
+    #ARGS.COUNT=-4
     #ARGS.SERVER_MOMENTUM=0.01
     check_arguments() # control arguments
     
@@ -45,6 +45,7 @@ if __name__ == '__main__':
       random.shuffle(Clients)
     ind=0
     print("Distribution of trainset for client "+str(ind),get_dataset_distribution(Clients[ind].train_loader.dataset),'size: '+str(len(Clients[ind].train_loader.dataset)))
+    print("Distribution of testset for client "+str(ind),get_dataset_distribution(Clients[ind].test_loader.dataset),'size: '+str(len(Clients[ind].test_loader.dataset)))
             
     print("-----------------------------------------")
     print("Count:",ARGS.COUNT)
@@ -76,7 +77,7 @@ if __name__ == '__main__':
     
     #INSTANCE SERVER
     Server = Server()
-    
+
     #SERVER MODEL -> CLIENTS
     Clients = send_server_model_to_clients(Server, Clients)
 
@@ -88,7 +89,7 @@ if __name__ == '__main__':
       
       #TRAIN CLIENTS
       selected_clients = train_clients(selected_clients)
-      
+
       #CLIENTS UPDATES -> SERVER & AVERAGE
       Server = send_client_updates_to_server_and_aggregate(Server, selected_clients)
     
@@ -98,7 +99,7 @@ if __name__ == '__main__':
     
       #SERVER MODEL -> CLIENTS
       Clients = send_server_model_to_clients(Server, Clients)
-    
+
       #TEST
       seconds=str(round(float(time.time() - start_time),2))
       server_loss, server_accuracy = evaluate(Server.model, test_loader)
