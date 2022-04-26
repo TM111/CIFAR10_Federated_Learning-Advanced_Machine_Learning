@@ -154,7 +154,7 @@ def add_batch_norm(model):
         except: continue
     
         if isinstance(new_layer, nn.Conv2d):
-            new_layer=nn.Sequential(new_layer,nn.GroupNorm(ARGS.NUM_GROUPS,new_layer.out_channels))
+            new_layer=nn.Sequential(new_layer,nn.BatchNorm2d(new_layer.out_channels))
             setattr(model, layer, new_layer)
             
         elif isinstance(new_layer, nn.Sequential):
@@ -162,7 +162,7 @@ def add_batch_norm(model):
             for module in new_layer:
                 new_sequential.append(module)
                 if isinstance(module, nn.Conv2d):
-                    new_sequential.append(nn.GroupNorm(ARGS.NUM_GROUPS,module.out_channels))
+                    new_sequential.append(nn.BatchNorm2d(module.out_channels))
             new_layer = nn.Sequential(*new_sequential)
             setattr(model, layer, new_layer)
     return model
@@ -175,7 +175,7 @@ def add_group_norm(model):
         except: continue
     
         if isinstance(new_layer, nn.Conv2d):
-            new_layer=nn.Sequential(new_layer,nn.BatchNorm2d(new_layer.out_channels))
+            new_layer=nn.Sequential(new_layer,nn.GroupNorm(ARGS.NUM_GROUPS,new_layer.out_channels))
             setattr(model, layer, new_layer)
             
         elif isinstance(new_layer, nn.Sequential):
@@ -183,7 +183,7 @@ def add_group_norm(model):
             for module in new_layer:
                 new_sequential.append(module)
                 if isinstance(module, nn.Conv2d):
-                    new_sequential.append(nn.BatchNorm2d(module.out_channels))
+                    new_sequential.append(nn.GroupNorm(ARGS.NUM_GROUPS,module.out_channels))
             new_layer = nn.Sequential(*new_sequential)
             setattr(model, layer, new_layer)
     return model
