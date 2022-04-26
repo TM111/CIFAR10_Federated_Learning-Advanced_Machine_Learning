@@ -48,6 +48,9 @@ if __name__ == '__main__':
     print("Count:",ARGS.COUNT)
     print("Model:",ARGS.MODEL)
     print("Batch norm:",ARGS.BATCH_NORM)
+    print("Group norm:",ARGS.GROUP_NORM)
+    if(ARGS.GROUP_NORM):
+      print("Num groups:",ARGS.NUM_GROUPS)
     print("Freeze:",ARGS.FREEZE)
     print("Pretrain:",ARGS.PRETRAIN)
     
