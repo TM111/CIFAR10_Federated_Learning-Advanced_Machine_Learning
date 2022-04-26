@@ -45,6 +45,10 @@ def args_parser():
     
     parser.add_argument('--BATCH_NORM', type=int, default=0,
                         help="number of rounds of training")
+    parser.add_argument('--GROUP_NORM', type=int, default=0,
+                        help="number of rounds of training")
+    parser.add_argument('--NUM_GROUPS', type=int, default=16,
+                        help="number of rounds of training")
     
     parser.add_argument('--CENTRALIZED_MODE', type=int, default=0,
                         help="number of rounds of training")
@@ -139,6 +143,11 @@ def check_arguments():
     if(ARGS.DISTRIBUTION == 'multimodal' and (ARGS.Z<1 or ARGS.Z>4)):
         errors_count+=1
         errors += str(errors_count)+') Z must be between 1 and 4.\n\n'
+    
+    if(ARGS.MODEL in ["LeNet5","LeNet5_mod","CNNCifar","CNNNet","AllConvNet"]):
+        if(ARGS.BATCH_NORM+ARGS.GROUP_NORM>1):
+            errors_count+=1
+            errors += str(errors_count)+') Disable one of these: BATCH_NORM and GROUP_NORM.\n\n'
         
     if(errors_count>0):
         sys.exit(errors)
@@ -161,4 +170,5 @@ def check_arguments():
     
     if(ARGS.MODEL in ["mobilenet_v3_small","resnet18","densenet121","googlenet"]):
         ARGS.BATCH_NORM=0
+        ARGS.GROUP_NORM=0
    

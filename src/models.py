@@ -154,6 +154,27 @@ def add_batch_norm(model):
         except: continue
     
         if isinstance(new_layer, nn.Conv2d):
+            new_layer=nn.Sequential(new_layer,nn.GroupNorm(ARGS.NUM_GROUPS,new_layer.out_channels))
+            setattr(model, layer, new_layer)
+            
+        elif isinstance(new_layer, nn.Sequential):
+            new_sequential=[]
+            for module in new_layer:
+                new_sequential.append(module)
+                if isinstance(module, nn.Conv2d):
+                    new_sequential.append(nn.GroupNorm(ARGS.NUM_GROUPS,module.out_channels))
+            new_layer = nn.Sequential(*new_sequential)
+            setattr(model, layer, new_layer)
+    return model
+
+def add_group_norm(model):
+    layers=list(dict(model.named_modules()).keys())
+    for layer in layers:
+        try:
+            new_layer=getattr(model, layer)
+        except: continue
+    
+        if isinstance(new_layer, nn.Conv2d):
             new_layer=nn.Sequential(new_layer,nn.BatchNorm2d(new_layer.out_channels))
             setattr(model, layer, new_layer)
             
@@ -196,6 +217,10 @@ def get_net_and_optimizer():
       #ADD BATCH NORMALIZATION
       if(ARGS.BATCH_NORM): 
           model=add_batch_norm(model)
+      
+      #ADD GROUP NORMALIZATION
+      elif(ARGS.GROUP_NORM): 
+          model=add_group_norm(model)
       
       #FREEZING CONVOLUTIONAL LAYERS
       parameters_to_optimize=model.parameters()

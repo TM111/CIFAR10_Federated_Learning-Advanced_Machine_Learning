@@ -14,11 +14,12 @@ if __name__ == '__main__':
         ARGS.DEVICE='cpu'
         ARGS.MODEL='LeNet5' # LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, 
         ARGS.NUM_EPOCHS=2                     # mobilenet_v3_small, resnet18, densenet121, googlenet 
-        ARGS.BATCH_NORM=1
+        ARGS.BATCH_NORM=0
+        ARGS.GROUP_NORM=1
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
         
-        ARGS.ALGORITHM='FedAvg'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
+        ARGS.ALGORITHM='SCAFFOLD'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
         
         ARGS.DISTRIBUTION='dirichlet' # iid, non_iid, dirichlet, multimodal
         ARGS.ALPHA=0.2
@@ -26,10 +27,6 @@ if __name__ == '__main__':
         ARGS.NUM_CLIENTS=100
         ARGS.NUM_SELECTED_CLIENTS=3
 
-    
-    #ARGS.LR=0.005
-    #ARGS.COUNT=-4
-    #ARGS.SERVER_MOMENTUM=0.01
     check_arguments() # control arguments
     
     train_set, test_set, train_loader, test_loader = get_dataset()  #download dataset
@@ -77,7 +74,7 @@ if __name__ == '__main__':
     
     #INSTANCE SERVER
     Server = Server()
-
+    
     #SERVER MODEL -> CLIENTS
     Clients = send_server_model_to_clients(Server, Clients)
 
