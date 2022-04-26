@@ -12,14 +12,14 @@ if __name__ == '__main__':
     if(ARGS.COLAB == 0): #test locally
     
         ARGS.DEVICE='cpu'
-        ARGS.MODEL='LeNet5' # LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, 
+        ARGS.MODEL='AllConvNet' # LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, 
         ARGS.NUM_EPOCHS=2                     # mobilenet_v3_small, resnet18, densenet121, googlenet 
-        ARGS.BATCH_NORM=0
-        ARGS.GROUP_NORM=1
+        ARGS.BATCH_NORM=1
+        ARGS.GROUP_NORM=0
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
         
-        ARGS.ALGORITHM='SCAFFOLD'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
+        ARGS.ALGORITHM='FedAvg'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
         
         ARGS.DISTRIBUTION='dirichlet' # iid, non_iid, dirichlet, multimodal
         ARGS.ALPHA=0.2
