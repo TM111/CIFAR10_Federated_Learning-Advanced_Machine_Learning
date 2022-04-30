@@ -47,8 +47,6 @@ def args_parser():
                         help="number of rounds of training")
     parser.add_argument('--GROUP_NORM', type=int, default=0,
                         help="number of rounds of training")
-    parser.add_argument('--NUM_GROUPS', type=int, default=16,
-                        help="number of rounds of training")
     
     parser.add_argument('--CENTRALIZED_MODE', type=int, default=0,
                         help="number of rounds of training")
@@ -58,9 +56,9 @@ def args_parser():
     parser.add_argument('--ALPHA', type=float, default=0.5,
                         help="number of rounds of training")
     
-    parser.add_argument('--RATIO', type=float, default=0.8,
+    parser.add_argument('--RATIO', type=float, default=0.75,
                         help="number of rounds of training")
-    parser.add_argument('--Z', type=int, default=2,
+    parser.add_argument('--Z', type=int, default=3,
                         help="number of rounds of training")
     
     parser.add_argument('--NUM_CLASS_RANGE', type=list, default=[1,7],

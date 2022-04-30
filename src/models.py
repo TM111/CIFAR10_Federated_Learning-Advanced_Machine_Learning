@@ -176,14 +176,14 @@ def add_group_norm(model):
     
         if isinstance(new_layer, nn.Conv2d):
             if(new_layer.out_channels%5==0):
-                ARGS.NUM_GROUPS=5
+                num_groups=5
             elif(new_layer.out_channels%4==0):
-                ARGS.NUM_GROUPS=4
+                num_groups=4
             elif(new_layer.out_channels%3==0):
-                ARGS.NUM_GROUPS=3
+                num_groups=3
             elif(new_layer.out_channels%2==0):
-                ARGS.NUM_GROUPS=2
-            new_layer=nn.Sequential(new_layer,nn.GroupNorm(ARGS.NUM_GROUPS,new_layer.out_channels))
+                num_groups=2
+            new_layer=nn.Sequential(new_layer,nn.GroupNorm(num_groups,new_layer.out_channels))
             setattr(model, layer, new_layer)
             
         elif isinstance(new_layer, nn.Sequential):
@@ -192,14 +192,14 @@ def add_group_norm(model):
                 new_sequential.append(module)
                 if isinstance(module, nn.Conv2d):
                     if(new_layer.out_channels%5==0):
-                        ARGS.NUM_GROUPS=5
+                        num_groups=5
                     elif(new_layer.out_channels%4==0):
-                        ARGS.NUM_GROUPS=4
+                        num_groups=4
                     elif(new_layer.out_channels%3==0):
-                        ARGS.NUM_GROUPS=3
+                        num_groups=3
                     elif(new_layer.out_channels%2==0):
-                        ARGS.NUM_GROUPS=2
-                    new_sequential.append(nn.GroupNorm(ARGS.NUM_GROUPS,module.out_channels))
+                        num_groups=2
+                    new_sequential.append(nn.GroupNorm(num_groups,module.out_channels))
             new_layer = nn.Sequential(*new_sequential)
             setattr(model, layer, new_layer)
     return model

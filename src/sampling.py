@@ -175,6 +175,7 @@ def get_cached_clients():
             clients_list= pickle.load(config_dictionary_file)
             for i in range(len(clients_list)):
                 clients_list[i].net, clients_list[i].optimizer=get_net_and_optimizer()
+                clients_list[i].local_epochs=ARGS.NUM_EPOCHS
                 if(ARGS.ALGORITHM=='SCAFFOLD'):
                     c_local=clients_list[i].net.state_dict() # local control variates (SCAFFOLD)
                     for key in c_local: c_local[key] = c_local[key]*0.0

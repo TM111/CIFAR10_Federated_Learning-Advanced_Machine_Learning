@@ -48,6 +48,7 @@ def average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list):
         for i in range(len(local_updates_list)):
             for key in local_updates_list[i].keys():
                 updates_avg[key] = updates_avg[key] + local_updates_list[i][key] * n_list[i] / a_i_list[i]
+                
         for key in updates_avg.keys():
             updates_avg[key] = updates_avg[key] / total_n 
         
