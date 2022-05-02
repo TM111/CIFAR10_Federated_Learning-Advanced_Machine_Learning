@@ -12,17 +12,17 @@ if __name__ == '__main__':
     if(ARGS.COLAB == 0): #test locally
     
         ARGS.DEVICE='cpu'
-        ARGS.MODEL='AllConvNet' # LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, 
+        ARGS.MODEL='CNNNet' # LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, 
         ARGS.NUM_EPOCHS=2                     # mobilenet_v3_small, resnet18, densenet121, googlenet 
         ARGS.BATCH_NORM=0
-        ARGS.GROUP_NORM=1
+        ARGS.GROUP_NORM=0
         ARGS.PRETRAIN=False
         ARGS.FREEZE=False
         
         ARGS.ALGORITHM='FedAvg'  # FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
         
-        ARGS.DISTRIBUTION='multimodal' # iid, non_iid, dirichlet, multimodal
-        ARGS.ALPHA=0.2
+        ARGS.DISTRIBUTION='dirichlet' # iid, non_iid, dirichlet, multimodal
+        ARGS.ALPHA=0.1
         #ARGS.CENTRALIZED_MODE=True
         ARGS.NUM_CLIENTS=100
         ARGS.NUM_SELECTED_CLIENTS=3
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     if(Clients==None):
         train_loader_list=get_train_distribution(train_set) #split trainset to current distribution
         Clients=get_clients_list(train_loader_list, train_set, test_set) #generate client list
-    
+
     for i in range(random.randint(2,7)):
       random.shuffle(Clients)
     ind=0

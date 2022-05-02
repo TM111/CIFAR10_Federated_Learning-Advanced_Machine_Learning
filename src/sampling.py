@@ -84,7 +84,7 @@ def cifar_iid(train_set): # all clients have all classes with the same data dist
   return user_images
 
 
-def cifar_noniid(train_set): # all clients have a number of class beetwen 1 and 4 with the same data distribution
+def cifar_noniid(train_set): # all clients have a number of class beetwen 1 and 7 with the same data distribution
   user_images=cifar_iid(train_set)
   for key in user_images.keys():
     n_classes=random.randint(ARGS.NUM_CLASS_RANGE[0],ARGS.NUM_CLASS_RANGE[1])
@@ -143,7 +143,7 @@ def get_train_distribution(train_set):
     elif(ARGS.DISTRIBUTION=='iid'):
       train_user_images=cifar_iid(train_set)
     
-    elif(ARGS.DISTRIBUTION=='non_iid'):  # https://towardsdatascience.com/preserving-data-privacy-in-deep-learning-part-2-6c2e9494398b
+    elif(ARGS.DISTRIBUTION=='non_iid'):  #NON IID  https://towardsdatascience.com/preserving-data-privacy-in-deep-learning-part-2-6c2e9494398b
       train_user_images=cifar_noniid(train_set)
       
     elif(ARGS.DISTRIBUTION=='multimodal'):  # https://arxiv.org/pdf/2008.05687.pdf
@@ -187,7 +187,8 @@ def get_cached_clients():
     else:
         if(ARGS.COLAB==0):
            files = [f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
-           for f in files: os.remove(dir+f)
+           if(ARGS.COUNT!=-718):
+               for f in files: os.remove(dir+f)
         return None
     
     

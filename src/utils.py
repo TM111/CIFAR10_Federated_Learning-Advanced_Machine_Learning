@@ -39,22 +39,17 @@ def average_weights(Server, n_list, local_updates_list, tau_list, c_delta_list):
 
     
     if(ARGS.ALGORITHM == 'FedNova'): #https://github.com/Xtra-Computing/NIID-Bench
-        a_i_list=[]
-        rho=ARGS.MOMENTUM
-        for tau in tau_list:
-            a_i = (tau - rho * (1 - rho**tau) / (1 - rho)) / (1 - rho)
-            a_i_list.append(a_i)
-        
+
         for i in range(len(local_updates_list)):
             for key in local_updates_list[i].keys():
-                updates_avg[key] = updates_avg[key] + local_updates_list[i][key] * n_list[i] / a_i_list[i]
+                updates_avg[key] = updates_avg[key] + local_updates_list[i][key] * n_list[i] / tau_list[i]
                 
         for key in updates_avg.keys():
             updates_avg[key] = updates_avg[key] / total_n 
         
         coeff = 0.0   # τeff
         for i in range(len(n_list)):
-            coeff = coeff + a_i_list[i] * n_list[i] / total_n
+            coeff = coeff + tau_list[i] * n_list[i] / total_n
         ARGS.SERVER_LR=coeff
         
     elif(ARGS.ALGORITHM in ['FedAvg','FedAvgM','FedSGD','FedProx','SCAFFOLD']):

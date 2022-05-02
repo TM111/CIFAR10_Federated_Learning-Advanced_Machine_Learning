@@ -51,7 +51,10 @@ class LeNet5_mod(nn.Module):
         x = func.max_pool2d(x, 2)
         x = func.relu(self.conv2(x))
         x = func.max_pool2d(x, 2)
+        print(x.size())
         x = x.view(x.size(0), -1)
+        print(x.size())
+        print('-----------')
         x = self.classifier(x)
         return x
 
