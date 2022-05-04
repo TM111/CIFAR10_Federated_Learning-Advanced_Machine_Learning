@@ -4,82 +4,52 @@ import sys
 def args_parser():
     parser = argparse.ArgumentParser()
     
-    parser.add_argument('--DEVICE', type=str, default='cuda',
-                        help="number of rounds of training")
-    parser.add_argument('--ALGORITHM', type=str, default='FedAvg',
-                        help="number of rounds of training")
+    parser.add_argument('--DEVICE', type=str, default='cuda')
+    parser.add_argument('--ALGORITHM', type=str, default='FedAvg')
     
     # federated arguments (Notation for the arguments followed from paper)
-    parser.add_argument('--NUM_EPOCHS', type=int, default=2,
-                        help="number of rounds of training")
-    parser.add_argument('--NUM_CLASSES', type=int, default=10,
-                        help="number of rounds of training")
-    parser.add_argument('--BATCH_SIZE', type=int, default=64,
-                        help="number of rounds of training")
-    parser.add_argument('--SERVER_LR', type=float, default=1,
-                        help="number of rounds of training")
-    parser.add_argument('--MU', type=float, default=0.3,
-                        help="number of rounds of training")
-    parser.add_argument('--LR', type=float, default=0.01,
-                        help="number of rounds of training")
-    parser.add_argument('--MOMENTUM', type=float, default=0.9,
-                        help="number of rounds of training")
-    parser.add_argument('--SERVER_MOMENTUM', type=float, default=0.9,
-                        help="number of rounds of training")
-    parser.add_argument('--WEIGHT_DECAY', type=float, default=4e-4,
-                        help="number of rounds of training")
+    parser.add_argument('--NUM_EPOCHS', type=int, default=2)
+    parser.add_argument('--NUM_CLASSES', type=int, default=10)
+    parser.add_argument('--BATCH_SIZE', type=int, default=64)
+    parser.add_argument('--SERVER_LR', type=float, default=1)
+    parser.add_argument('--MU', type=float, default=0.3)
+    parser.add_argument('--LR', type=float, default=0.01)
+    parser.add_argument('--MOMENTUM', type=float, default=0.9)
+    parser.add_argument('--SERVER_MOMENTUM', type=float, default=0.9)
+    parser.add_argument('--WEIGHT_DECAY', type=float, default=4e-4)
     
-    parser.add_argument('--OPTIMIZER', type=str, default='sgd',
-                        help="number of rounds of training")
-    parser.add_argument('--PRETRAIN', type=int, default=0,
-                        help="number of rounds of training")
-    parser.add_argument('--FREEZE', type=int, default=0,
-                        help="number of rounds of training")
+    parser.add_argument('--OPTIMIZER', type=str, default='sgd')
+    parser.add_argument('--PRETRAIN', type=int, default=0)
+    parser.add_argument('--FREEZE', type=int, default=0)
     
-    parser.add_argument('--FEDIR', type=int, default=0,
-                        help="number of rounds of training")
-    parser.add_argument('--FEDVC', type=int, default=0,
-                        help="number of rounds of training")
-    parser.add_argument('--NVC', type=int, default=256,
-                        help="number of rounds of training")
+    parser.add_argument('--FEDIR', type=int, default=0)
+    parser.add_argument('--FEDVC', type=int, default=0)
+    parser.add_argument('--NVC', type=int, default=256)
     
-    parser.add_argument('--BATCH_NORM', type=int, default=0,
-                        help="number of rounds of training")
-    parser.add_argument('--GROUP_NORM', type=int, default=0,
-                        help="number of rounds of training")
+    parser.add_argument('--BATCH_NORM', type=int, default=0,)
+    parser.add_argument('--GROUP_NORM', type=int, default=0)
     
-    parser.add_argument('--CENTRALIZED_MODE', type=int, default=0,
-                        help="number of rounds of training")
-    parser.add_argument('--DISTRIBUTION', type=str, default='iid',
-                        help="number of rounds of training")
+    parser.add_argument('--CENTRALIZED_MODE', type=int, default=0)
+    parser.add_argument('--DISTRIBUTION', type=str, default='iid')
     
-    parser.add_argument('--ALPHA', type=float, default=0.5,
-                        help="number of rounds of training")
+    parser.add_argument('--ALPHA', type=float, default=0.5)
     
-    parser.add_argument('--RATIO', type=float, default=0.75,
-                        help="number of rounds of training")
-    parser.add_argument('--Z', type=int, default=3,
-                        help="number of rounds of training")
+    parser.add_argument('--RATIO', type=float, default=0.75)
+    parser.add_argument('--Z', type=int, default=3)
     
-    parser.add_argument('--NUM_CLASS_RANGE', type=list, default=[1,7],
-                        help="number of rounds of training")
+    parser.add_argument('--NUM_CLASS_RANGE', type=list, default=[1,7])
     
-    parser.add_argument('--NUM_CLIENTS', type=int, default=100,
-                        help="number of rounds of training")
-    parser.add_argument('--NUM_SELECTED_CLIENTS', type=int, default=3,
-                        help="number of rounds of training")
-    parser.add_argument('--ROUNDS', type=int, default=30,
-                        help="number of rounds of training")
-    parser.add_argument('--COUNT', type=int, default=0,
-                        help="number of rounds of training")
+    parser.add_argument('--NUM_CLIENTS', type=int, default=100)
+    parser.add_argument('--NUM_SELECTED_CLIENTS', type=int, default=3)
+    parser.add_argument('--ROUNDS', type=int, default=30)
+    parser.add_argument('--COUNT', type=int, default=0)
     
 
 
     # model arguments
     parser.add_argument('--MODEL', type=str, default='mlp', help='model name')
     
-    parser.add_argument('--COLAB', type=int, default=0,
-                        help="number of rounds of training")
+    parser.add_argument('--COLAB', type=int, default=0)
 
     args = parser.parse_args()
     return args
