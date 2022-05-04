@@ -26,5 +26,5 @@ bank transactions).
 
 ## Options
 
-The default values for various paramters parsed to the experiment are given in 'options.py'. Details are given some of those parameters:
+The default values for various paramters parsed to the experiment are given in `options.py`. Details are given some of those parameters:
 
