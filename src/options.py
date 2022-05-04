@@ -4,11 +4,11 @@ import sys
 def args_parser():
     parser = argparse.ArgumentParser()
     
-    parser.add_argument('--DEVICE', type=str, default='cuda')
-    parser.add_argument('--ALGORITHM', type=str, default='FedAvg')
+    parser.add_argument('--DEVICE', type=str, default='cuda') #cuda, cpu
+    parser.add_argument('--ALGORITHM', type=str, default='FedAvg') #FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
     
     # federated arguments (Notation for the arguments followed from paper)
-    parser.add_argument('--NUM_EPOCHS', type=int, default=2)
+    parser.add_argument('--NUM_EPOCHS', type=int, default=3)
     parser.add_argument('--NUM_CLASSES', type=int, default=10)
     parser.add_argument('--BATCH_SIZE', type=int, default=64)
     parser.add_argument('--SERVER_LR', type=float, default=1)
@@ -18,38 +18,38 @@ def args_parser():
     parser.add_argument('--SERVER_MOMENTUM', type=float, default=0.9)
     parser.add_argument('--WEIGHT_DECAY', type=float, default=4e-4)
     
-    parser.add_argument('--OPTIMIZER', type=str, default='sgd')
+    parser.add_argument('--OPTIMIZER', type=str, default='sgd') #sgd, adam
     parser.add_argument('--PRETRAIN', type=int, default=0)
     parser.add_argument('--FREEZE', type=int, default=0)
     
     parser.add_argument('--FEDIR', type=int, default=0)
     parser.add_argument('--FEDVC', type=int, default=0)
-    parser.add_argument('--NVC', type=int, default=256)
+    parser.add_argument('--NVC', type=int, default=256)  #NVC value for FedVC
     
-    parser.add_argument('--BATCH_NORM', type=int, default=0,)
+    parser.add_argument('--BATCH_NORM', type=int, default=0)
     parser.add_argument('--GROUP_NORM', type=int, default=0)
     
-    parser.add_argument('--CENTRALIZED_MODE', type=int, default=0)
-    parser.add_argument('--DISTRIBUTION', type=str, default='iid')
+    parser.add_argument('--CENTRALIZED_MODE', type=int, default=0) # set 1 for standard centralized approach
+    parser.add_argument('--DISTRIBUTION', type=str, default='iid') #iid, non_iid, dirichlet, multimodal
     
-    parser.add_argument('--ALPHA', type=float, default=0.5)
+    parser.add_argument('--ALPHA', type=float, default=0.5)  #[0, 0.05, 0.1, 0.20, 0.5, 1, 10, 100] alpha values for Dirichlet distribution 
     
-    parser.add_argument('--RATIO', type=float, default=0.75)
-    parser.add_argument('--Z', type=int, default=3)
+    parser.add_argument('--RATIO', type=float, default=0.75) #ratio value for Multimodal distribution
+    parser.add_argument('--Z', type=int, default=3)    #Z value for Multimodal distribution
     
-    parser.add_argument('--NUM_CLASS_RANGE', type=list, default=[1,7])
+    parser.add_argument('--NUM_CLASS_RANGE', type=list, default=[1,7])  #maximum and minimum number of classes per client in the non_iid distribution
     
     parser.add_argument('--NUM_CLIENTS', type=int, default=100)
-    parser.add_argument('--NUM_SELECTED_CLIENTS', type=int, default=3)
-    parser.add_argument('--ROUNDS', type=int, default=30)
-    parser.add_argument('--COUNT', type=int, default=0)
+    parser.add_argument('--NUM_SELECTED_CLIENTS', type=int, default=25)
+    parser.add_argument('--ROUNDS', type=int, default=25)
+    parser.add_argument('--COUNT', type=int, default=0)    
     
 
 
     # model arguments
-    parser.add_argument('--MODEL', type=str, default='mlp', help='model name')
+    parser.add_argument('--MODEL', type=str, default='mlp', help='model name') #LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, mobilenet_v3_small, resnet18, densenet121, googlenet
     
-    parser.add_argument('--COLAB', type=int, default=0)
+    parser.add_argument('--COLAB', type=int, default=0) #set to 1 if you want to run this code on Google Colab
 
     args = parser.parse_args()
     return args
