@@ -23,3 +23,21 @@ bank transactions).
 3. Understand the importance of clients’ local data distribution in the federated scenario.
 4. Understand the contribution of the normalization layers.
 5. Make a contribution for solving existing issues.
+
+## Options
+
+The default values for various paramters parsed to the experiment are given in `options.py`. Details are given some of those parameters:
+- `--MODEL`: LeNet5, LeNet5_mod, CNNCifar, CNNNet, AllConvNet, mobilenet_v3_small, resnet18, densenet121, googlenet 
+- `--ALGORITHM`: FedAvg, FedAvgM, FedSGD, FedProx, FedNova, SCAFFOLD
+- `--DISTRIBUTION`: iid, non_iid, dirichlet, multimodal
+- `--BATCH_NORM`: 0, 1 
+- `--GROUP_NORM`: 0, 1 
+- `--PRETRAIN`: 0, 1 
+- `--FREEZE`: 0, 1 (train only the FC layers)
+- `--NUM_EPOCHS`: default 3 (local epochs of clients) 
+- `--LR`: default 0.01 (learning rate of clients)
+- `--MOMENTUM`: default 0.9 (momentum of clients)
+- `--NUM_CLIENTS`: default 100 
+- `--NUM_SELECTED_CLIENTS`: default 25
+- `--ROUNDS`: default 25 
+
